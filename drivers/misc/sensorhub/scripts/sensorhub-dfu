@@ -1,0 +1,263 @@
+#!/system/bin/sh
+
+#
+# Example Sensorhub Firmware Upgrade for Android
+#
+
+#
+# Depends on the following Android properties:
+#	sensorhub.dfu.enabled         <0|1>
+#	sensorhub.dfu.path            firmware file location
+#	sensorhub.frs.scd.install     <0|1>
+#	sensorhub.frs.scd.path        SCD record location
+#	sensorhub.frs.fuserate.install <0|1>
+#	sensorhub.frs.fuserate.path    Maximum fusion period record location
+#	sensorhub.frs.arvr.install <0|1>
+#	sensorhub.frs.arvr.path    ARVR configuration record location
+#	                             (rotation vector)
+#	sensorhub.frs.arvrgame.install <0|1>
+#	sensorhub.frs.arvrgame.path    ARVR configuration record location
+#	                                 (game rotation vector)
+#	sensorhub.frs.step.install <0|1>
+#	sensorhub.frs.step.path    Step configuration record location
+
+
+alias logd='log -p d -t "sensorhub-dfu"'
+alias logi='log -p i -t "sensorhub-dfu"'
+alias logw='log -p w -t "sensorhub-dfu"'
+alias loge='log -p e -t "sensorhub-dfu"'
+
+function loge {
+	log -p e -t "sensorhub" "$@"
+}
+
+function _getprop {
+	local v=$(getprop $1)
+	echo -n ${v:-$2}
+}
+
+DFU_ENABLED=$(_getprop sensorhub.dfu.enabled 0)
+DFU_FILE=$(_getprop sensorhub.dfu.path /vendor/firmware/FSP3xx.bin)
+SCD_ENABLED=$(_getprop sensorhub.frs.scd.install 0)
+SCD_FILE=$(_getprop sensorhub.frs.scd.path /system/etc/hcrest/scd.frs)
+FUSION_RATE_ENABLED=$(_getprop sensorhub.frs.fuserate.install 0)
+FUSION_RATE_FILE=$(_getprop sensorhub.frs.fuserate.path /system/etc/hcrest/fuserate.frs)
+ARVR_ENABLED=$(_getprop sensorhub.frs.arvr.install 0)
+ARVR_FILE=$(_getprop sensorhub.frs.arvr.path /system/etc/hcrest/arvr.frs)
+ARVRGAME_ENABLED=$(_getprop sensorhub.frs.arvrgame.install 0)
+ARVRGAME_FILE=$(_getprop sensorhub.frs.arvrgame.path /system/etc/hcrest/arvrgame.frs)
+STEP_ENABLED=$(_getprop sensorhub.frs.step.install 0)
+STEP_FILE=$(_getprop sensorhub.frs.step.path /system/etc/hcrest/step.frs)
+
+if ! cd /sys/devices/virtual/misc/sensorhub0
+then
+	loge "sensorhub driver not loaded'"
+	exit 1
+fi
+
+function die {
+	loge "$*"
+	exit 1
+}
+
+function get-word {
+	file=$1
+	offset=$(( $2 / 4 ))
+	dump=$(dd if=$1 bs=4 count=1 skip=$offset 2> /dev/null | command hd /proc/self/fd/0)
+
+	# extract our 4 hex bytes from output like '00000000: 65 72 d0 28 s 1cf\nsum 1cf'
+	word=${dump:10:2}${dump:13:2}${dump:16:2}${dump:19:2}
+	# print as decimal
+	echo $((  0x$word  ))
+}
+
+function get-file-size {
+	ls -l $1 2> /dev/null | while read line
+	do
+		eval set -- $line
+		echo $4
+	done
+}
+
+function parse-dfu-metadata {
+	local file=$1
+
+	local magic=$(get-word $file 0)
+	local sz=$(get-word $file 4)
+	local format=$(get-word $file 8)
+	local payload=$(get-word $file 12)
+
+	if [[ "$magic"  -ne $(( 0x6572d028 ))      ]] || \
+	   [[ "$sz"     -ne $(get-file-size $file) ]] || \
+	   [[ "$format" -ne 4 ]]
+	then
+		die "$file is not a valid firmware image"
+	fi
+
+	dd if=$file bs=1 skip=16 count=$(( $payload - 16 )) 2> /dev/null | \
+	while read line
+	do
+		logd "File: $line"
+		line=${line%?}
+		key=${line%%:*}
+		key=${key//-/_} # replace - to _
+		value=${line#*:}
+		value=${value# } # trim
+		echo "local $key=\"$value\""
+	done
+
+	return 0
+}
+
+function hubtool-get-ver {
+	hubtool show productids | while read line
+	do
+		line=${line/;/ } 		# strip the ;
+		# match 'Part Number = %8u Version = %u.%u.%u.%05u'
+		# 		 $1   $2    $3  $4   $5    $6  $7
+		eval set -- $line
+		echo "local INST_PN=$4"
+		echo "local INST_VER=${7/%??????/}" # strip the build number part
+		break
+	done
+	return 0
+}
+
+function dfu-do-install {
+	logd "performing firmware upgrade; state=$(cat state)"
+	if echo "update" > state && [ "$(cat state)" == "app" ]
+	then
+		logi "firmware upgrade success"
+		return 0
+	fi
+	loge "firmware upgrade error, driver state=$(cat state), check dmesg"
+	return 1
+}
+
+function dfu-run {
+	file=$1
+
+	metadata=$(parse-dfu-metadata $file) || return $?
+	eval $metadata
+
+	if [ -z "$SW_Part_Number" ] || [ -z "$SW_Version" ]
+	then
+		die "$file is not a valid firmware image (no metadata)"
+	fi
+
+	SW_Part_Number=${SW_Part_Number/-/}
+
+	if [ "$SW_Version" == "255.255.255" ]
+	then
+		logd "$file is a development firmware (ver=$SW_Version)"
+		return 0
+	fi
+
+	if [ "$(cat state)" == "bootloader-noimage" ]
+	then
+		logi "DFU bare device to ver=$SW_Version, pn=$SW_Part_Number"
+		dfu-do-install || return 1
+	fi
+
+	if [ "$(cat state)" != "app" ]
+	then
+		loge "Unexpected bootloader state = $(cat state)"
+		return 1
+	fi
+
+	dver=$(hubtool-get-ver) || return $?
+	eval $dver
+
+	if [ -z "$INST_PN" ] || [ -z "$INST_VER" ]
+	then
+		die "could not get device version info"
+	fi
+
+	if [ "$INST_PN" != "${SW_Part_Number}" ]
+	then
+		logw "$file: does not match device's firmware"
+		logd "installed: $INST_PN, image: $SW_Part_Number"
+		return 1
+	fi
+
+	logd "Device pn=$INST_PN ver=$INST_VER; FW File pn=$SW_Part_Number ver=$SW_Version"
+	if [ "$INST_VER" == "255.255.255" ] || \
+	   [ $(ver-comp $INST_VER $SW_Version) -gt 0 ]
+	then
+		logi "DFU from $INST_VER to $SW_Version"
+		dfu-do-install || return 1
+		return 0
+	else
+		logi "Skip DFU"
+	fi
+}
+
+function ver-split {
+	prefix=$1
+	ver=$2
+	echo local ${prefix}major=${ver%%.*}
+	ver=${ver#*.}
+	echo local ${prefix}minor=${ver%%.*}
+	echo local ${prefix}patch=${ver#*.}
+}
+
+# print a positive value if $2 > $1
+function ver-comp {
+	eval $(ver-split old_ $1)
+	eval $(ver-split new_ $2)
+
+	if [ "$old_major" == "$new_major" ]
+	then
+		if [ "$old_minor" == "$new_minor" ]
+		then
+			echo $(( $new_patch - $old_patch ))  2>/dev/null || return 1
+			return 0
+		fi
+		echo $(( $new_minor - $old_minor ))  2>/dev/null || return 1
+		return 0
+	fi
+
+	echo $(( $new_major - $old_major )) 2>/dev/null || return 1
+}
+
+
+function frs-check {
+	[ "$1" == "0" ] && return 0
+
+	status=$(hubtool pull $2 2>&1 )
+	if [ $? -ne 0 ]
+	then
+		case $status in
+		 *READ_RECORD_EMPTY* ) 
+			logd "pushing $2 $3"
+			hubtool push $2 $3
+			if [ $? -eq 0 ]
+			then
+				export REBOOT_REQUIRED=1
+			else
+				loge "Failed to push FRS record $2 $3"
+			fi
+		 ;;
+		esac
+	fi
+	return $?
+}
+
+if [ $DFU_ENABLED = 1 ]
+then
+	dfu-run $DFU_FILE || exit 1
+fi
+
+frs-check $SCD_ENABLED scd $SCD_FILE
+frs-check $FUSION_RATE_ENABLED maxfuse $FUSION_RATE_FILE
+frs-check $ARVR_ENABLED arvr $ARVR_FILE
+frs-check $ARVRGAME_ENABLED arvrgame $ARVRGAME_FILE
+frs-check $STEP_ENABLED step $STEP_FILE
+
+if [ "$REBOOT_REQUIRED" == "1" ]
+then
+	logd "rebooting after FRS writes"
+	echo 'soft' > /sys/devices/virtual/misc/sensorhub0/reset
+fi
+
+exit 0

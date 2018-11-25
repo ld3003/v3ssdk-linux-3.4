@@ -1,0 +1,24 @@
+#!/system/bin/sh
+
+function klog() {
+	echo $* > /dev/kmsg
+}
+
+setprop persist.sys.sh.modload_started 1
+rmhub $*
+err=$?
+[ $err -ne 0 ] && exit $err
+
+klog ">>>>>>>>>>>> insmod <<<<<<<<<<<<"
+for mod in sensorhub-core sensorhub-i2c
+do
+	if [ -f /vendor/lib/modules/$mod.ko ]
+	then
+		klog " >>> module - $mod"
+		out=$(insmod /vendor/lib/modules/$mod.ko 2>&1)
+		err=$?
+		[ $err -ne 0 ] && klog $out && exit $err
+	fi
+done
+klog ">>>>>>>>>>>> insmod <<<<<<<<<<<<"
+setprop persist.sys.sh.modload_started 0

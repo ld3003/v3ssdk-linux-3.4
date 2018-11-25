@@ -1,0 +1,9 @@
+#
+# Input device configuration
+#
+
+config SPI_NAND
+	tristate "SPI Nand Flash"
+	default y
+	help
+	  If unsure, say Y.
