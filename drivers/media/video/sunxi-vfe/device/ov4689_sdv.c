@@ -14,10 +14,6 @@
 #include <media/v4l2-mediabus.h>
 #include <linux/io.h>
 
-#include "../isp_cfg/SENSOR_H/ov4689_sdv_full_size_v3.h"
-#include "../isp_cfg/SENSOR_H/ov4689_sdv_720p_v3.h"
-#include "../isp_cfg/SENSOR_H/ov4689_sdv_720p120_v3.h"
-#include "../isp_cfg/SENSOR_H/ov4689_sdv_1080p_v3.h"
 
 #include "camera.h"
 
@@ -489,53 +485,6 @@ static struct regval_list sensor_quxga_30fps_regs[] = {
 
 };
 
-static struct regval_list sensor_quxga_25fps_regs[] = {
-	// Full Resolution 2688x1520 25fps  
-	{0x0100, 0x00}, // sleep
-	{REG_DLY,0x20},
-	
-	{0x030d, 0x1e},//  ; PLL2 multiplier
-	{REG_DLY,0x20},
-	
-	{0x3501, 0x60},// ; long exposure H
-	{0x3632, 0x00},// ; ADC & Analog
-	{0x376b, 0x20},// ; Sensor control
-	{0x3800, 0x00},//  ; H crop start H
-	{0x3801, 0x08},//  ; H crop start L
-	{0x3803, 0x04},//  ; V crop start L
-	{0x3804, 0x0a},//  ; H crop end H
-	{0x3805, 0x97},//  ; H crop end L
-	{0x3807, 0xfb},//  ; V crop end L
-	{0x3808, 0x0a},//  ; H output size H
-	{0x3809, 0x80},//  ; H output size L
-	{0x380a, 0x05},//  ; V output size H
-	{0x380b, 0xf0},//  ; V output size L
-	{0x380c, 0x05},//  ; HTS H
-	{0x380d, 0x08},//  ; HTS L
-	{0x380e, 0x0e},//  ; VTS H
-	{0x380f, 0x90},//  ; VTS L
-	{0x3811, 0x08},//  ; H win off L
-	{0x3813, 0x04},//  ; V win off L
-	{0x3814, 0x01},//  ; H inc odd
-	{0x3820, 0x06},//  ; flip off, bin off
-	{0x3821, 0x00},//  ; mirror on, bin off
-	{0x382a, 0x01},//  ; vertical subsample odd increase number
-	{0x3830, 0x04},//  ; blc use num/2
-	{0x3836, 0x01},//  ; r zline use num/2
-	{0x4001, 0x40},//  ; debug mode
-	{0x4022, 0x07},//  ; Anchor left end H
-	{0x4023, 0xcf},//  ; Anchor left end L
-	{0x4024, 0x09},//  ; Anchor right start H
-	{0x4025, 0x60},//  ; Andhor right start L
-	{0x4026, 0x09},//  ; Anchor right end H
-	{0x4027, 0x6f},//  ; Anchor right end L
-	{0x4502, 0x40},//  ; ADC sync control
-	{0x4503, 0x02},//  ; ADC sync control
-	{0x4601, 0x04},//  ; V fifo read start
-	{0x0100, 0x01}, // wake up
-};
-
-
 static struct regval_list sensor_quxga_60fps_regs[] = {
 	// Full Resolution 2688x1520 60fps  
 	{0x0100, 0x00}, // sleep
@@ -595,10 +544,10 @@ static struct regval_list sensor_720p_120fps_regs[] = {
 	{0x376b, 0x40},// ; Sensor control
 	{0x3800, 0x00},//  ; H crop start H
 	{0x3801, 0x08},//  ; H crop start L
-	{0x3803, 0x08},//0x04},//  ; V crop start L
+	{0x3803, 0x04},//  ; V crop start L
 	{0x3804, 0x0a},//  ; H crop end H
 	{0x3805, 0x9f},//  ; H crop end L
-	{0x3807, 0xff},//0xfb},//  ; V crop end L
+	{0x3807, 0xfb},//  ; V crop end L
 	{0x3808, 0x05},//  ; H output size H
 	{0x3809, 0x40},//  ; H output size L
 	{0x380a, 0x02},//  ; V output size H
@@ -1360,72 +1309,8 @@ static struct sensor_win_size sensor_win_sizes[] = {
 			.length = 4,
 			.ev_step = 40,
 		},
-		.isp_cfg = &ov4689_sdv_full_size_v3,
-	},
-	{
-		.width		= 2688,
-		.height 	= 1520,
-		.hoffset	= 0,
-		.voffset	= 0,
-		.hts		= 1288,
-		.vts		= 3728,
-		.pclk		= 120*1000*1000,
-		.mipi_bps	= 672*1000*1000,
-		.fps_fixed	= 25,
-		.bin_factor = 1,
-		.intg_min	= 16,
-		.intg_max	=(3728-4)<<4,
-		.gain_min	= 1<<4,
-		.gain_max	= (16<<4)-1,
-		.regs		= sensor_quxga_25fps_regs,
-		.regs_size	= ARRAY_SIZE(sensor_quxga_25fps_regs),
-		.set_size	= NULL,
-		.sensor_ae_tbl = {
-			.ae_tbl =  
-			{			
-				{8000 , 100 , 256  , 256, }, 
-				{100  , 100,  256  , 768, }, 
-				{100  , 25 ,  768 , 768, }, 
-				{25   , 25 ,  768 , 4080, },
-			},
-			.length = 4,
-			.ev_step = 40,
-		},
-		.isp_cfg = &ov4689_sdv_full_size_v3,
 	},
 	
-	{
-		.width		= 2688,
-		.height 	= 1520,
-		  .hoffset	  = 0,
-		  .voffset	  = 0,
-		  .hts		  = 1288,
-		  .vts		  = 3108,
-		  .pclk 	  = 120*1000*1000,
-		  .mipi_bps   = 672*1000*1000,
-		  .fps_fixed  = 30,
-		  .bin_factor = 1,
-		  .intg_min   = 16,
-		  .intg_max   = (3108-4)<<4,
-		  .gain_min   = 1<<4,
-		  .gain_max   = (30<<4)-1,
-		  .regs 	  = sensor_quxga_30fps_regs,
-		  .regs_size  = ARRAY_SIZE(sensor_quxga_30fps_regs),
-		  .set_size   = NULL,
-		.sensor_ae_tbl = {
-			.ae_tbl =  
-			{			
-				{8000 , 100 , 256  , 256, }, 
-				{100  , 100,  256  , 768, }, 
-				{100  , 30 ,  768 , 768, }, 
-				{30   , 30,  768 , 4080, },
-			},
-			.length = 4,
-			.ev_step = 40,
-		},
-		.isp_cfg = &ov4689_sdv_full_size_v3,
-	  },
-
 	  /* 2048*1520 for 4:3 capture */
 	{
 		.width		= 2048,
@@ -1456,7 +1341,6 @@ static struct sensor_win_size sensor_win_sizes[] = {
 			.length = 4,
 			.ev_step = 40,
 		},
-		.isp_cfg = &ov4689_sdv_full_size_v3,
 	},
 
 	{
@@ -1490,7 +1374,6 @@ static struct sensor_win_size sensor_win_sizes[] = {
 			.length = 4,
 			.ev_step = 40,
 		},
-		.isp_cfg = &ov4689_sdv_full_size_v3,
 	  },
 	  
 ///////////////////////////1080P//////////////////////////////   
@@ -1525,7 +1408,7 @@ static struct sensor_win_size sensor_win_sizes[] = {
 			.length = 4,
 			.ev_step = 40,
 		},
-		.isp_cfg = &ov4689_sdv_full_size_v3,
+
 	},
 	{
 		.width		= HD1080_WIDTH,
@@ -1558,7 +1441,7 @@ static struct sensor_win_size sensor_win_sizes[] = {
 			.length = 4,
 			.ev_step = 40,
 		},
-		.isp_cfg = &ov4689_sdv_full_size_v3,
+
 	},
 	
 	{
@@ -1592,7 +1475,6 @@ static struct sensor_win_size sensor_win_sizes[] = {
 			.length = 4,
 			.ev_step = 40,
 		},
-		.isp_cfg = &ov4689_sdv_1080p_v3,
 	},
 	
 	{
@@ -1620,68 +1502,31 @@ static struct sensor_win_size sensor_win_sizes[] = {
 			{			
 				{8000 , 100 , 256  , 256, }, 
 				{100  , 100,  256  , 768, }, 
-				{100  , 60 ,  768 , 768, }, 
-				{60  , 60 ,  768 , 4080, }, 
+				{100  , 50 ,  768 , 768, }, 
+				{50  , 50 ,  768 , 4080, }, 
 			},
 			.length = 4,
 			.ev_step = 40,
 		},
-		.isp_cfg = &ov4689_sdv_1080p_v3,
-	},
-	
-		{
-		.width		= 1440,
-		.height 	= HD1080_HEIGHT,
-		.hoffset	= 0,
-		.voffset	= 0,
-		.hts		= 1288,
-		.vts		= 3108,
-		.pclk		= 120*1000*1000,
-		.mipi_bps	= 672*1000*1000,
-		.fps_fixed	= 30,
-		.bin_factor = 1,
-		.intg_min	= 16,
-		.intg_max	= (3108-4)<<4,
-		.gain_min	= 1<<4,
-		.gain_max	= (16<<4)-1,
-		.width_input	  = 2688,
-		.height_input	  = 1520,
-		.regs		= sensor_quxga_30fps_regs,
-		.regs_size	= ARRAY_SIZE(sensor_quxga_30fps_regs),
-		.set_size	= NULL,
-		.sensor_ae_tbl = {
-			.ae_tbl =  
-			{			
-				{8000 , 100 , 256  , 256, }, 
-				{100  , 100,  256  , 768, }, 
-				{100  , 30 ,  768 , 768, }, 
-				{30   , 30,  768 , 4080, },
-			},
-			.length = 4,
-			.ev_step = 40,
-		},
-		.isp_cfg = &ov4689_sdv_full_size_v3,
 	},
 ///////////////////////////720P//////////////////////////////	
 	{
-		.width		= HD720_WIDTH,
-		.height 	= HD720_HEIGHT,
-		.hoffset	= 0,
-		.voffset	= 0,
-		.hts		= 1288,
-		.vts		= 3108,
-		.pclk		= 120*1000*1000,
+		.width	    = HD720_WIDTH,
+		.height     = HD720_HEIGHT,
+		.hoffset	= 32,//(1344-1280)/2,
+		.voffset	= 20,//(760-720)/2,
+		.hts		= 1368,
+		.vts		= 2144,
+		.pclk	    = 88*1000*1000,
 		.mipi_bps	= 672*1000*1000,
 		.fps_fixed	= 30,
 		.bin_factor = 1,
 		.intg_min	= 16,
-		.intg_max	= (3108-4)<<4,
+		.intg_max	= (2144-4)<<4,
 		.gain_min	= 1<<4,
 		.gain_max	= (16<<4)-1,
-		.width_input	  = 2688,
-		.height_input	  = 1520,
-		.regs		= sensor_quxga_30fps_regs,
-		.regs_size	= ARRAY_SIZE(sensor_quxga_30fps_regs),
+		.regs	    = sensor_720p_30fps_regs,
+		.regs_size	= ARRAY_SIZE(sensor_720p_30fps_regs),
 		.set_size	= NULL,
 		.sensor_ae_tbl = {
 			.ae_tbl =  
@@ -1689,54 +1534,49 @@ static struct sensor_win_size sensor_win_sizes[] = {
 				{8000 , 100 , 256  , 256, }, 
 				{100  , 100,  256  , 768, }, 
 				{100  , 30 ,  768 , 768, }, 
-				{30   , 30,  768 , 4080, },
+				{30 , 30 ,  768 , 4080, }, 
 			},
 			.length = 4,
 			.ev_step = 40,
 		},
-		.isp_cfg = &ov4689_sdv_720p_v3,
 	},
 
-	
 	{
 		.width	    = HD720_WIDTH,
-		.height 	= HD720_HEIGHT,
-		.hoffset	= 0,
-		.voffset	= 0,
-		.hts		= 1288,
-		.vts		= 1554,
-		.pclk 	    = 120*1000*1000,
-		.mipi_bps   = 672*1000*1000,
-		.fps_fixed  = 60,
+		.height     = HD720_HEIGHT,
+		.hoffset	= 32,//(1344-1280)/2,
+		.voffset	= 20,//(760-720)/2,
+		.hts		= 1368,
+		.vts		= 1072,
+		.pclk	    = 88*1000*1000,
+		.mipi_bps	= 672*1000*1000,
+		.fps_fixed	= 60,
 		.bin_factor = 1,
-		.intg_min   = 16,
-		.intg_max   =(1554-4)<<4,
-		.gain_min   = 1<<4,
-		.gain_max   = (30<<4)-1,
-		.width_input	= 2688,
-		.height_input   = 1520,
-		.regs 	    = sensor_quxga_60fps_regs,
-		.regs_size  = ARRAY_SIZE(sensor_quxga_60fps_regs),
-		.set_size   = NULL,
+		.intg_min	= 16,
+		.intg_max	= (1072-4)<<4,
+		.gain_min	= 1<<4,
+		.gain_max	= (30<<4)-1,
+		.regs	    = sensor_720p_60fps_regs,
+		.regs_size	= ARRAY_SIZE(sensor_720p_60fps_regs),
+		.set_size	= NULL,
 		.sensor_ae_tbl = {
 			.ae_tbl =  
 			{			
 				{8000 , 100 , 256  , 256, }, 
 				{100  , 100,  256  , 768, }, 
-				{100  , 60 ,  768 , 768, }, 
-				{60  , 60 ,  768 , 4080, }, 
+				{100  , 50 ,  768 , 768, }, 
+				{50  , 50 ,  768 , 4080, }, 
 			},
 			.length = 4,
 			.ev_step = 40,
 		},
-		.isp_cfg = &ov4689_sdv_720p_v3,
 	},
 	
 	{
 		.width	    = HD720_WIDTH,
 		.height     = HD720_HEIGHT,
-		.hoffset	= 0,//32,//(1344-1280)/2,
-		.voffset	= 0,//20,//(760-720)/2,
+		.hoffset	= 32,//(1344-1280)/2,
+		.voffset	= 20,//(760-720)/2,
 		.hts		= 1368,
 		.vts		= 800,
 		.pclk	    = 132*1000*1000,
@@ -1747,22 +1587,18 @@ static struct sensor_win_size sensor_win_sizes[] = {
 		.intg_max	= (800-4)<<4,
 		.gain_min	= 1<<4,
 		.gain_max	= (30<<4)-1,
-			.width_input	  = 1344,
-		.height_input	  = 760,
-
 		.regs	    = sensor_720p_120fps_regs,
 		.regs_size	= ARRAY_SIZE(sensor_720p_120fps_regs),
 		.set_size	= NULL,
 		.sensor_ae_tbl = {
 			.ae_tbl =  
 			{			
-				{8000 , 120 , 256  , 256, }, 
-				{120  , 120,  256  , 4080, }, 
+				{8000 , 100 , 256  , 256, }, 
+				{100  , 100,  256  , 4080, }, 
 			},
 			.length = 2,
 			.ev_step = 40,
 		},
-		.isp_cfg = &ov4689_sdv_720p120_v3,
 	},
 	
 ///////////////////////////WVGA//////////////////////////////	
@@ -1797,7 +1633,6 @@ static struct sensor_win_size sensor_win_sizes[] = {
 			.length = 4,
 			.ev_step = 40,
 		},
-		.isp_cfg = &ov4689_sdv_720p_v3,
 	},
 	
 	{
@@ -1831,7 +1666,6 @@ static struct sensor_win_size sensor_win_sizes[] = {
 			.length = 4,
 			.ev_step = 40,
 		},
-		.isp_cfg = &ov4689_sdv_720p_v3,
 	},
 	
 	{
@@ -1863,7 +1697,6 @@ static struct sensor_win_size sensor_win_sizes[] = {
 			.length = 2,
 			.ev_step = 40,
 		},
-		.isp_cfg = &ov4689_sdv_720p_v3,
 	},
 	
 	{
@@ -1893,7 +1726,6 @@ static struct sensor_win_size sensor_win_sizes[] = {
 			.length = 2,
 			.ev_step = 40,
 		},
-		.isp_cfg = &ov4689_sdv_720p_v3,
 	},
 };
 
@@ -1918,7 +1750,6 @@ static int sensor_enum_size(struct v4l2_subdev *sd,
   fsize->type = V4L2_FRMSIZE_TYPE_DISCRETE;
   fsize->discrete.width = sensor_win_sizes[fsize->index].width;
   fsize->discrete.height = sensor_win_sizes[fsize->index].height;
-  fsize->reserved[0] = sensor_win_sizes[fsize->index].fps_fixed;
   
   return 0;
 }

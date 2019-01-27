@@ -19,7 +19,6 @@
 #include "isp_cfg/isp_cfg.h"
 #define SIZE_OF_LSC_TBL_MOD0     7*768*2
 #define SIZE_OF_LSC_TBL_MOD1     8*768*2
-#define SIZE_OF_LSC_TBL_MOD2     12*768*2
 #define SIZE_OF_HDR_TBL     4*256*2
 #define SIZE_OF_GAMMA_TBL   256*2
 
@@ -846,8 +845,7 @@ struct isp_init_config isp_init_def_cfg = {
       .adaptive_frame_rate      = 1,
       .high_quality_mode_en     = 0,
       .force_frame_rate         = 0,
-	.ae_touch_dist_ind = 2,
-	.ae_lum_berfore_gamma = 0,
+
       /*isp awb param */
       .awb_interval                 = 4,
       .awb_speed = 8,
@@ -856,37 +854,18 @@ struct isp_init_config isp_init_def_cfg = {
       .awb_color_temper_high    = 7500,
       .awb_base_temper = 6500,
       .awb_skin_color_num = 0,
-      .awb_special_color_num = 0,
-      .awb_rgain_favor = 256,
-	.awb_bgain_favor = 256,
-
       .af_use_otp = 0,
       .vcm_min_code             = 0,
       .vcm_max_code             = 650,
       .af_interval_time = 100,
-	.af_speed_ind = 16, //0~43
+	.af_speed_ind = 4, //0~5
 	.af_auto_fine_en = 1,
 	.af_single_fine_en = 0,
 	.af_fine_step = 24,
 	.af_move_cnt = 4,
 	.af_still_cnt = 1,
-	.af_move_monitor_cnt = 6,
-	.af_still_monitor_cnt = 2,
 	.af_stable_min = 250,
 	.af_stable_max = 260,
-	.af_low_light_ind = 40,
-	.af_near_tolerance = 5,
-	.af_far_tolerance = 7,
-	.af_tolerance_off = 0,
-	.af_peak_th = 100,
-	.af_dir_th = 10, 
-
-	.af_change_ratio = 20,
-	.af_move_minus = 1,
-	.af_still_minus = 1,
-	.af_scene_motion_th = 10,
-	.af_tolerance_tbl_len = 0,
-	
     },
     .isp_tunning_settings =
     {
@@ -898,7 +877,7 @@ struct isp_init_config isp_init_def_cfg = {
       .dpc_th_slop               = 4,
       .dpc_otf_min_th            = 16,
       .dpc_otf_max_th            = 1024,
-	.cfa_dir_th = 500,
+
       .front_camera = 0,
       .defog_value   =200,
       .hor_visual_angle = 60,
@@ -1068,9 +1047,6 @@ SET_ISP_SINGLE_VALUE(isp_3a_settings, ae_min_frame_rate);
 SET_ISP_SINGLE_VALUE(isp_3a_settings, exp_delay_frame);
 SET_ISP_SINGLE_VALUE(isp_3a_settings, gain_delay_frame);
 SET_ISP_SINGLE_VALUE(isp_3a_settings, exp_comp_step);
-SET_ISP_SINGLE_VALUE(isp_3a_settings, ae_touch_dist_ind);
-SET_ISP_SINGLE_VALUE(isp_3a_settings, ae_lum_berfore_gamma);
-
 
 SET_ISP_SINGLE_VALUE(isp_3a_settings, high_quality_mode_en);
 SET_ISP_SINGLE_VALUE(isp_3a_settings, adaptive_frame_rate);
@@ -1080,13 +1056,11 @@ SET_ISP_SINGLE_VALUE(isp_3a_settings, awb_speed);
 SET_ISP_SINGLE_VALUE(isp_3a_settings, awb_color_temper_low);
 SET_ISP_SINGLE_VALUE(isp_3a_settings, awb_color_temper_high);
 SET_ISP_SINGLE_VALUE(isp_3a_settings, awb_base_temper);
-SET_ISP_SINGLE_VALUE(isp_3a_settings, awb_rgain_favor);
-SET_ISP_SINGLE_VALUE(isp_3a_settings, awb_bgain_favor);
 
 SET_ISP_SINGLE_VALUE(isp_3a_settings, awb_light_num);
 SET_ISP_SINGLE_VALUE(isp_3a_settings, awb_ext_light_num);
 SET_ISP_SINGLE_VALUE(isp_3a_settings, awb_skin_color_num);
-SET_ISP_SINGLE_VALUE(isp_3a_settings, awb_special_color_num);
+SET_ISP_SINGLE_VALUE(isp_3a_settings, awb_green_color_num);
 
 SET_ISP_SINGLE_VALUE(isp_3a_settings, af_use_otp);
 SET_ISP_SINGLE_VALUE(isp_3a_settings, vcm_min_code);
@@ -1099,24 +1073,8 @@ SET_ISP_SINGLE_VALUE(isp_3a_settings, af_single_fine_en);
 SET_ISP_SINGLE_VALUE(isp_3a_settings, af_fine_step);
 SET_ISP_SINGLE_VALUE(isp_3a_settings, af_move_cnt);
 SET_ISP_SINGLE_VALUE(isp_3a_settings, af_still_cnt);
-SET_ISP_SINGLE_VALUE(isp_3a_settings, af_move_monitor_cnt);
-SET_ISP_SINGLE_VALUE(isp_3a_settings, af_still_monitor_cnt);
-
 SET_ISP_SINGLE_VALUE(isp_3a_settings, af_stable_min);
 SET_ISP_SINGLE_VALUE(isp_3a_settings, af_stable_max);
-SET_ISP_SINGLE_VALUE(isp_3a_settings, af_low_light_ind);
-SET_ISP_SINGLE_VALUE(isp_3a_settings, af_near_tolerance);
-SET_ISP_SINGLE_VALUE(isp_3a_settings, af_far_tolerance);
-SET_ISP_SINGLE_VALUE(isp_3a_settings, af_tolerance_off);
-SET_ISP_SINGLE_VALUE(isp_3a_settings, af_peak_th);
-SET_ISP_SINGLE_VALUE(isp_3a_settings, af_dir_th);
-
-SET_ISP_SINGLE_VALUE(isp_3a_settings, af_change_ratio);
-SET_ISP_SINGLE_VALUE(isp_3a_settings, af_move_minus);
-SET_ISP_SINGLE_VALUE(isp_3a_settings, af_still_minus);
-SET_ISP_SINGLE_VALUE(isp_3a_settings, af_scene_motion_th);
-SET_ISP_SINGLE_VALUE(isp_3a_settings, af_tolerance_tbl_len);
-
 
 SET_ISP_SINGLE_VALUE(isp_tunning_settings, flash_gain);
 SET_ISP_SINGLE_VALUE(isp_tunning_settings, flash_delay_frame);
@@ -1125,7 +1083,6 @@ SET_ISP_SINGLE_VALUE(isp_tunning_settings, flicker_ratio);
 SET_ISP_SINGLE_VALUE(isp_tunning_settings, dpc_th_slop);
 SET_ISP_SINGLE_VALUE(isp_tunning_settings, dpc_otf_min_th);
 SET_ISP_SINGLE_VALUE(isp_tunning_settings, dpc_otf_max_th);
-SET_ISP_SINGLE_VALUE(isp_tunning_settings, cfa_dir_th);
 SET_ISP_SINGLE_VALUE(isp_tunning_settings, front_camera);
 SET_ISP_SINGLE_VALUE(isp_tunning_settings, defog_value);
 SET_ISP_SINGLE_VALUE(isp_tunning_settings, hor_visual_angle);
@@ -1144,14 +1101,12 @@ void set_lsc_center_y(struct isp_init_config *isp_ini_cfg, void *value, int len)
 SET_ISP_ARRAY_VALUE(isp_3a_settings, awb_light_info);
 SET_ISP_ARRAY_VALUE(isp_3a_settings, awb_ext_light_info);
 SET_ISP_ARRAY_VALUE(isp_3a_settings, awb_skin_color_info);
-SET_ISP_ARRAY_VALUE(isp_3a_settings, awb_special_color_info);
+SET_ISP_ARRAY_VALUE(isp_3a_settings, awb_green_color_info);
 SET_ISP_ARRAY_VALUE(isp_3a_settings, awb_preset_gain);
 SET_ISP_ARRAY_VALUE(isp_3a_settings, ae_table_preview);
 SET_ISP_ARRAY_VALUE(isp_3a_settings, ae_table_capture);
 SET_ISP_ARRAY_VALUE(isp_3a_settings, ae_table_video);
 SET_ISP_ARRAY_VALUE(isp_3a_settings, ae_win_weight);
-SET_ISP_ARRAY_VALUE(isp_3a_settings, af_std_code_tbl);
-SET_ISP_ARRAY_VALUE(isp_3a_settings, af_tolerance_value_tbl);
 
 SET_ISP_ARRAY_VALUE(isp_tunning_settings, bayer_gain_offset);
 SET_ISP_ARRAY_VALUE(isp_tunning_settings, csc_coeff);
@@ -1253,9 +1208,6 @@ static struct IspParamAttribute Isp3aParam[] =
 	ISP_FILE_SINGLE_ATTR(isp_ae_cfg,	high_quality_mode_en    ),            
 	ISP_FILE_SINGLE_ATTR(isp_ae_cfg,	adaptive_frame_rate     ),            
 	ISP_FILE_SINGLE_ATTR(isp_ae_cfg,	force_frame_rate        ),            
-	ISP_FILE_SINGLE_ATTR(isp_ae_cfg,	ae_touch_dist_ind        ), 
-	ISP_FILE_SINGLE_ATTR(isp_ae_cfg,	ae_lum_berfore_gamma        ), 
-	
 	ISP_FILE_SINGLE_ATTR(isp_awb_cfg,	awb_interval           	),             
 	ISP_FILE_SINGLE_ATTR(isp_awb_cfg,	awb_speed           	),             
 	ISP_FILE_SINGLE_ATTR(isp_awb_cfg,	awb_color_temper_low    ),             
@@ -1265,19 +1217,15 @@ static struct IspParamAttribute Isp3aParam[] =
 	ISP_FILE_SINGLE_ATTR(isp_awb_cfg,	awb_light_num     		),             
 	ISP_FILE_SINGLE_ATTR(isp_awb_cfg,	awb_ext_light_num       ),             
 	ISP_FILE_SINGLE_ATTR(isp_awb_cfg,	awb_skin_color_num      ),
-	ISP_FILE_SINGLE_ATTR(isp_awb_cfg,	awb_special_color_num      ),
-
-	ISP_FILE_SINGLE_ATTR(isp_awb_cfg,	awb_rgain_favor), 
-	ISP_FILE_SINGLE_ATTR(isp_awb_cfg,	awb_bgain_favor), 
+	ISP_FILE_SINGLE_ATTR(isp_awb_cfg,	awb_green_color_num      ),
 	
 	ISP_FILE_ARRAY_ATTR(isp_awb_cfg,	awb_light_info          ,	  100 ),
 	ISP_FILE_ARRAY_ATTR(isp_awb_cfg,	awb_ext_light_info      ,	   60 ),
 	ISP_FILE_ARRAY_ATTR(isp_awb_cfg,	awb_skin_color_info     ,	   40 ),
-	ISP_FILE_ARRAY_ATTR(isp_awb_cfg,	awb_special_color_info     ,	   40 ),
+	ISP_FILE_ARRAY_ATTR(isp_awb_cfg,	awb_green_color_info     ,	   40 ),
 	
 	{ "isp_awb_cfg",  "awb_perset_gain",             22 ,  set_awb_preset_gain             ,},
 	ISP_FILE_SINGLE_ATTR(isp_af_cfg, 	af_use_otp     ),      
-
 	ISP_FILE_SINGLE_ATTR(isp_af_cfg, 	vcm_min_code     ),
 	ISP_FILE_SINGLE_ATTR(isp_af_cfg, 	vcm_max_code     ),
 	ISP_FILE_SINGLE_ATTR(isp_af_cfg, 	af_interval_time ),
@@ -1287,27 +1235,8 @@ static struct IspParamAttribute Isp3aParam[] =
 	ISP_FILE_SINGLE_ATTR(isp_af_cfg, 	af_fine_step     ),
 	ISP_FILE_SINGLE_ATTR(isp_af_cfg, 	af_move_cnt      ),
 	ISP_FILE_SINGLE_ATTR(isp_af_cfg, 	af_still_cnt     ),          
-	ISP_FILE_SINGLE_ATTR(isp_af_cfg, 	af_move_monitor_cnt      ),
-	ISP_FILE_SINGLE_ATTR(isp_af_cfg, 	af_still_monitor_cnt     ),      
-
 	ISP_FILE_SINGLE_ATTR(isp_af_cfg, 	af_stable_min      ),
 	ISP_FILE_SINGLE_ATTR(isp_af_cfg, 	af_stable_max     ),      
-
-	ISP_FILE_SINGLE_ATTR(isp_af_cfg, 	af_low_light_ind      ),
-	ISP_FILE_SINGLE_ATTR(isp_af_cfg, 	af_near_tolerance     ),      
-	ISP_FILE_SINGLE_ATTR(isp_af_cfg, 	af_far_tolerance      ),
-	ISP_FILE_SINGLE_ATTR(isp_af_cfg, 	af_tolerance_off     ),      
-
-	ISP_FILE_SINGLE_ATTR(isp_af_cfg, 	af_peak_th      ),
-	ISP_FILE_SINGLE_ATTR(isp_af_cfg, 	af_dir_th     ),      
-
-	ISP_FILE_SINGLE_ATTR(isp_af_cfg, af_change_ratio),
-	ISP_FILE_SINGLE_ATTR(isp_af_cfg, af_move_minus),
-	ISP_FILE_SINGLE_ATTR(isp_af_cfg, af_still_minus),
-	ISP_FILE_SINGLE_ATTR(isp_af_cfg, af_scene_motion_th),
-	ISP_FILE_SINGLE_ATTR(isp_af_cfg,	af_tolerance_tbl_len      ),
-	ISP_FILE_ARRAY_ATTR(isp_af_cfg,	af_std_code_tbl          ,	  20 ),
-	ISP_FILE_ARRAY_ATTR(isp_af_cfg,	af_tolerance_value_tbl      ,	   20 ),
 };
 static struct IspParamAttribute IspIsoParam[] =
 {
@@ -1327,12 +1256,9 @@ static struct IspParamAttribute IspTuningParam[] =
 	ISP_FILE_SINGLE_ATTR(isp_tuning_cfg	, 	color_denoise_level	),
 	ISP_FILE_SINGLE_ATTR(isp_tuning_cfg	, 	flash_gain         	),
 	ISP_FILE_SINGLE_ATTR(isp_tuning_cfg	, 	flash_delay_frame  	),
-	ISP_FILE_SINGLE_ATTR(isp_tuning_cfg   	, 	cfa_dir_th     	),
-
 	ISP_FILE_SINGLE_ATTR(isp_dpc_cfg   	, 	dpc_th_slop 			),
 	ISP_FILE_SINGLE_ATTR(isp_dpc_cfg   	, 	dpc_otf_min_th     	),
 	ISP_FILE_SINGLE_ATTR(isp_dpc_cfg   	, 	dpc_otf_max_th     	),
-	
 	ISP_FILE_SINGLE_ATTR(isp_tuning_cfg	, 	flicker_type       	),
 	ISP_FILE_SINGLE_ATTR(isp_tuning_cfg	, 	flicker_ratio		),
 	ISP_FILE_SINGLE_ATTR(isp_tuning_cfg	, 	front_camera       	),
@@ -1404,25 +1330,13 @@ int fetch_isp_cfg(struct isp_init_config *isp_ini_cfg, struct cfg_section *cfg_s
 			{
 				param->len = 10 * isp_ini_cfg->isp_3a_settings.awb_skin_color_num;
 			}
-			if(!strcmp(param->sub, "awb_special_color_info"))
+			if(!strcmp(param->sub, "awb_green_color_info"))
 			{
-				param->len = 10 * isp_ini_cfg->isp_3a_settings.awb_special_color_num;
+				param->len = 10 * isp_ini_cfg->isp_3a_settings.awb_green_color_num;
 			}
 
-			if(!strcmp(param->sub, "af_std_code_tbl"))
-			{
-				param->len = isp_ini_cfg->isp_3a_settings.af_tolerance_tbl_len;
-			}
-			if(!strcmp(param->sub, "af_tolerance_value_tbl"))
-			{
-				param->len = isp_ini_cfg->isp_3a_settings.af_tolerance_tbl_len;
-			}
-			if (param->len) {
-				array_value = (int *)vmalloc(param->len*sizeof(int));
-				memset(array_value, 0, param->len*sizeof(int));
-			} else {
-				array_value = NULL;
-			}
+			array_value = (int*)vmalloc(param->len*sizeof(int));
+			memset(array_value, 0, param->len*sizeof(int));
 			for(j = 0;j<param->len;j++)
 			{
 				sprintf(sub_name, "%s_%d",param->sub, j);
@@ -1438,7 +1352,7 @@ int fetch_isp_cfg(struct isp_init_config *isp_ini_cfg, struct cfg_section *cfg_s
 					vfe_dbg(0,"fetch_isp_cfg_array: %s->%s  = %d\n",param->main, sub_name, subkey.value.val);
 				}
 			}
-			if (param->set_param && array_value)
+			if(param->set_param)
 			{
 				param->set_param(isp_ini_cfg, (void *)array_value, param->len);
 			}
@@ -1464,7 +1378,7 @@ int fetch_isp_tbl(struct isp_init_config *isp_ini_cfg, char* tbl_patch)
 	strcat(isp_lsc_tbl_path, "lsc_tbl.bin");
 
 	vfe_print("Fetch table form \"%s\", gamma num = %d\n",isp_gamma_tbl_path, isp_ini_cfg->isp_tunning_settings.gamma_num);
-	buf = (char*)kzalloc(SIZE_OF_LSC_TBL_MOD2,GFP_KERNEL);
+	buf = (char*)kzalloc(SIZE_OF_LSC_TBL_MOD1,GFP_KERNEL);
 
 	/* fetch gamma_tbl table! */
 	if(isp_ini_cfg->isp_tunning_settings.gamma_num > 1 && isp_ini_cfg->isp_tunning_settings.gamma_num <= 5 )
@@ -1495,12 +1409,8 @@ int fetch_isp_tbl(struct isp_init_config *isp_ini_cfg, char* tbl_patch)
 	/* fetch lsc table! */
 	if(0 == isp_ini_cfg->isp_tunning_settings.lsc_mod){
 		len = cfg_read_file(isp_lsc_tbl_path,buf,SIZE_OF_LSC_TBL_MOD0);
-	}else if(1 == isp_ini_cfg->isp_tunning_settings.lsc_mod){
-		len = cfg_read_file(isp_lsc_tbl_path,buf,SIZE_OF_LSC_TBL_MOD1);
 	}else{
-		len = cfg_read_file(isp_lsc_tbl_path,buf,SIZE_OF_LSC_TBL_MOD2);
-		if(len != SIZE_OF_LSC_TBL_MOD2)
-			vfe_warn("read lsc_tbl from lsc_tbl.bin len = %d, but %d is required\n", len, SIZE_OF_LSC_TBL_MOD2);
+		len = cfg_read_file(isp_lsc_tbl_path,buf,SIZE_OF_LSC_TBL_MOD1);
 	}
 	if(len < 0)
 	{

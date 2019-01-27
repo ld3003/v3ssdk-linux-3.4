@@ -5,8 +5,6 @@
 #ifndef __CAMERA_CFG_H__
 #define __CAMERA_CFG_H__
 #include "../lib/bsp_isp_algo.h"
-#include "../isp_cfg/isp_cfg.h"
-
 typedef enum tag_CAMERA_IO_CMD {
 	GET_CURRENT_WIN_CFG,
 	SET_FPS,
@@ -58,9 +56,6 @@ struct sensor_win_size {
 	int regs_size;
 	int (*set_size) (struct v4l2_subdev *sd);
 	struct ae_table_info sensor_ae_tbl;
-	struct isp_cfg_pt *isp_cfg;
-	struct isp_cfg_pt *isp_ir_cfg;
-
 };
 
 

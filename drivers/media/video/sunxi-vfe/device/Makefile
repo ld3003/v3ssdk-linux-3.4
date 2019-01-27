@@ -9,10 +9,6 @@ obj-$(CONFIG_OV4689_SDV)	+= ov4689_sdv.o
 obj-$(CONFIG_GC1004_MIPI)	+= gc1004_mipi.o
 obj-$(CONFIG_H22_MIPI)		+= h22_mipi.o
 obj-$(CONFIG_NT99231_MIPI)		+= nt99231_mipi.o
-obj-$(CONFIG_H42)		+= h42.o
-obj-$(CONFIG_IMX179)		+= imx179.o
-obj-$(CONFIG_OV683_RAW)		+= ov683_raw.o
-obj-$(CONFIG_OV8820_2LANE)		+= ov8820_2lane.o
 
 else
 obj-m			+= ov5640.o

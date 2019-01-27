@@ -898,7 +898,7 @@ static int uvc_v4l2_do_ioctl(struct inode *inode, struct file *file, unsigned in
 
 		if ((ret = uvc_acquire_privileges(handle)) < 0)
 			return ret;
-
+		uvc_printk(KERN_DEBUG, "(f:%s, l:%d) uvc buf count[%d], size[%d]bytes", __FUNCTION__, __LINE__, rb->count, bufsize);
 		ret = uvc_alloc_buffers(&stream->queue, rb->count, bufsize);
 		if (ret < 0)
 			return ret;

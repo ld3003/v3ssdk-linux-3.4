@@ -114,7 +114,7 @@ static void uvc_fixup_video_ctrl(struct uvc_streaming *stream,
 			}
 			else
 			{
-				ctrl->dwMaxVideoFrameSize = frame->wWidth*frame->wHeight*5/8;
+				ctrl->dwMaxVideoFrameSize = frame->wWidth*frame->wHeight*4/8;
 				if(ctrl->dwMaxVideoFrameSize < 32*1024)
 				{
 					ctrl->dwMaxVideoFrameSize = 32*1024;

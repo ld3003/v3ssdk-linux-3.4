@@ -495,7 +495,7 @@ void cfg_section_release(struct cfg_section **cfg_sct)
 struct file* cfg_open_file(char *file_path)
 {
 	struct file* fp;
-	fp = filp_open(file_path, O_RDWR | O_APPEND | O_CREAT, 0644);
+	fp = filp_open(file_path, O_RDWR | O_APPEND | O_CREAT, 644);
 	if(IS_ERR(fp)) {
 		printk("[vfe_warn]open %s failed!, ERR NO is %d.\n",file_path,  (int)fp);
 	}

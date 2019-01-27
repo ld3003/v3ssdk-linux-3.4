@@ -23,7 +23,7 @@ MODULE_DESCRIPTION("A low-level driver for OV2710 Raw sensors");
 MODULE_LICENSE("GPL");
 
 //for internel driver debug
-#define DEV_DBG_EN      1
+#define DEV_DBG_EN      1 
 #if(DEV_DBG_EN == 1)    
 #define vfe_dev_dbg(x,arg...) printk("[OV2710 Raw]"x,##arg)
 #else
@@ -108,12 +108,10 @@ static struct regval_list sensor_default_regs[] =
 {};
 
 static struct regval_list sensor_1080p_regs[] = { //1080: 1920*1080@30fps
-	{0x3008,0x82},
-	{REG_DLY,0x100},
-	{0x3008,0x42},  // Reset
-	{REG_DLY,0x100}, // yj
-//	{0x3818,0x60}, // yj flip,mirror
 	{0x3103,0x93},
+	{0x3008,0x82},
+	{REG_DLY,0x10},
+	{0x3008,0x42},
 	{0x3017,0x00},//7f},pad output enable01  0-input 1-output
 	{0x3018,0x00},//fc},pad output enable02  0-input 1-output
 	{0x3706,0x61},
@@ -179,6 +177,7 @@ static struct regval_list sensor_1080p_regs[] = { //1080: 1920*1080@30fps
 	{0x3a1f,0x10},
 	//{0x3008,0x02},
 
+
 	/*close ae */
 	{0x3503,0x07},
 	//{0x302c,0x02},
@@ -209,8 +208,6 @@ static struct regval_list sensor_1080p_regs[] = { //1080: 1920*1080@30fps
 	/* close lenc */
 	//{0x5000,0xdf},
 	{0x5000,0x5b},
-
-	// Change 0x02 to 0x00 by Harry
 	{0x3008,0x02},//nomal work mode
 };
 
@@ -353,8 +350,6 @@ static int sensor_read(struct v4l2_subdev *sd, unsigned short reg,
 	}
 	if(cnt>0)
 		vfe_dev_dbg("sensor read retry=%d\n",cnt);
-
-	// printk("sensor_read read ret = %d\n",ret);
   
 	return ret;
 }
@@ -396,8 +391,6 @@ static int sensor_write(struct v4l2_subdev *sd, unsigned short reg,
 	}
 	if(cnt>0)
 		vfe_dev_dbg("sensor write retry=%d\n",cnt);
-
-	// printk("ov2710_mipi:sensor_write ret = %d\n",ret);
 
 	return ret;
 }
@@ -455,7 +448,7 @@ static int sensor_s_exp(struct v4l2_subdev *sd, unsigned int exp_val)
 	sensor_write(sd, 0x3502, explow);
 	sensor_write(sd, 0x3501, expmid);
 	sensor_write(sd, 0x3500, exphigh);
-	// printk("2710 sensor_set_exp = %d Done!\n", exp_val );
+//	printk("2710 sensor_set_exp = %d Done!\n", exp_val );
 
 	info->exp = exp_val;
 	return 0;
@@ -533,7 +526,7 @@ static int sensor_s_gain(struct v4l2_subdev *sd, int gain_val)
 	sensor_write(sd, 0x3403, (awb_gain & 0xff));
 	sensor_write(sd, 0x3404, (awb_gain >> 8));
 	sensor_write(sd, 0x3405, (awb_gain & 0xff));
-	// printk("2710 sensor_set_gain = %d, 0x%x, 0x%x Done!\n", gain_val,gainlow, gainhigh );
+//	printk("2710 sensor_set_gain = %d, 0x%x, 0x%x Done!\n", gain_val,gainlow, gainhigh );
 	info->gain = gain_val;
 	
 	return 0;
@@ -568,16 +561,14 @@ static int sensor_s_exp_gain(struct v4l2_subdev *sd, struct sensor_exp_gain *exp
   else
 		frame_length = ov2710_sensor_vts;
 
-
   sensor_write(sd,0x3212,0x00);
   sensor_write(sd, 0x380f, (frame_length & 0xff));
   sensor_write(sd, 0x380e, (frame_length >> 8));
   sensor_s_exp(sd,exp_val);
   sensor_s_gain(sd,gain_val);
-
   sensor_write(sd,0x3212,0x10);
   sensor_write(sd,0x3212,0xa0);
-   
+  
  // printk("2710 sensor_set_gain gain= %d,exp= %d Done!\n", gain_val,exp_val);
 
   info->exp = exp_val;
@@ -639,28 +630,28 @@ static int sensor_power(struct v4l2_subdev *sd, int on)
 			vfe_dev_dbg("CSI_SUBDEV_PWR_ON!\n");
 			cci_lock(sd);
 			//power on reset
-			//vfe_gpio_set_status(sd,PWDN,1);//set the gpio to output
+			vfe_gpio_set_status(sd,PWDN,1);//set the gpio to output
 			vfe_gpio_set_status(sd,RESET,1);//set the gpio to output
-			//vfe_gpio_set_status(sd,POWER_EN,1);//set the gpio to output 
+			vfe_gpio_set_status(sd,POWER_EN,1);//set the gpio to output 
 			
-			vfe_gpio_write(sd,RESET,CSI_GPIO_LOW);  
-			//vfe_gpio_write(sd,PWDN,CSI_GPIO_HIGH);
-			//vfe_gpio_write(sd,POWER_EN,CSI_GPIO_LOW);
+			vfe_gpio_write(sd,RESET,CSI_GPIO_HIGH);  
+			vfe_gpio_write(sd,PWDN,CSI_GPIO_HIGH);
+			vfe_gpio_write(sd,POWER_EN,CSI_GPIO_LOW);
 			usleep_range(1000,1200);
 			//power supply
-			//vfe_set_pmu_channel(sd,IOVDD,ON);
+			vfe_set_pmu_channel(sd,IOVDD,ON);
 			//add by chao 
-			//usleep_range(1000,1200);
-			//vfe_set_pmu_channel(sd,AVDD,ON);	
-			//vfe_gpio_write(sd,POWER_EN,CSI_GPIO_HIGH);
-			//vfe_set_pmu_channel(sd,DVDD,ON);
-			//vfe_set_pmu_channel(sd,AFVDD,ON);
+			usleep_range(1000,1200);
+			vfe_set_pmu_channel(sd,AVDD,ON);	
+			vfe_gpio_write(sd,POWER_EN,CSI_GPIO_HIGH);
+			vfe_set_pmu_channel(sd,DVDD,ON);
+			vfe_set_pmu_channel(sd,AFVDD,ON);
 			//add by chao
-			//usleep_range(7000,8000);
-			//vfe_gpio_write(sd,PWDN,CSI_GPIO_LOW); 
-			//usleep_range(10000,12000); 
+			usleep_range(7000,8000);
+			vfe_gpio_write(sd,PWDN,CSI_GPIO_LOW); 
+			usleep_range(10000,12000); 
 			//reset on io
-			//vfe_gpio_write(sd,RESET,CSI_GPIO_LOW);
+			vfe_gpio_write(sd,RESET,CSI_GPIO_LOW);
 			usleep_range(20000,22000);
 			vfe_gpio_write(sd,RESET,CSI_GPIO_HIGH);
 			//active mclk before power on
@@ -672,22 +663,22 @@ static int sensor_power(struct v4l2_subdev *sd, int on)
 		case CSI_SUBDEV_PWR_OFF:
 			vfe_dev_dbg("CSI_SUBDEV_PWR_OFF!\n");
 			cci_lock(sd);
-			//vfe_gpio_set_status(sd,PWDN,1);//set the gpio to output
+			vfe_gpio_set_status(sd,PWDN,1);//set the gpio to output
 			vfe_gpio_set_status(sd,RESET,1);//set the gpio to output
 			vfe_gpio_write(sd,RESET,CSI_GPIO_LOW);  
-			//vfe_gpio_write(sd,PWDN,CSI_GPIO_HIGH);
+			vfe_gpio_write(sd,PWDN,CSI_GPIO_HIGH);
 			//inactive mclk before power off
 			vfe_set_mclk(sd,OFF);
 			//power supply off
-			//vfe_set_pmu_channel(sd,AFVDD,OFF);
-			//vfe_set_pmu_channel(sd,DVDD,OFF);
-			//vfe_gpio_write(sd,POWER_EN,CSI_GPIO_LOW);
-			//vfe_set_pmu_channel(sd,AVDD,OFF);
-			//vfe_set_pmu_channel(sd,IOVDD,OFF);
+			vfe_set_pmu_channel(sd,AFVDD,OFF);
+			vfe_set_pmu_channel(sd,DVDD,OFF);
+			vfe_gpio_write(sd,POWER_EN,CSI_GPIO_LOW);
+			vfe_set_pmu_channel(sd,AVDD,OFF);
+			vfe_set_pmu_channel(sd,IOVDD,OFF);
 			//set the io to hi-z
 			vfe_gpio_set_status(sd,RESET,0);//set the gpio to input
-			//vfe_gpio_set_status(sd,PWDN,0);//set the gpio to input
-			// vfe_gpio_set_status(sd,POWER_EN,0);//set the gpio to input
+			vfe_gpio_set_status(sd,PWDN,0);//set the gpio to input
+			vfe_gpio_set_status(sd,POWER_EN,0);//set the gpio to input
 			cci_unlock(sd);
 			break;
 		default:
@@ -789,10 +780,6 @@ static int sensor_init(struct v4l2_subdev *sd, u32 val)
 	reg_val_show(sd,0x3012);
 	
 	reg_val_show(sd,0x380c);
-
-	reg_val_show(sd,0x300a);
-	reg_val_show(sd,0x300b);
-	reg_val_show(sd,0x3818);	
   
 	return 0;
 }

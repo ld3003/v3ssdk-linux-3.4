@@ -20,8 +20,8 @@
 #include "bsp_cci.h"
 #include "../vfe_os.h"
 #include "../platform_cfg.h"
-int cci_dbg_en = 1;
-int cci_dbg_lv = 10;
+int cci_dbg_en = 0;
+int cci_dbg_lv = 1;
 #ifdef USE_SPECIFIC_CCI
 #define cci_print(x,arg...) printk(KERN_INFO"[VFE_DEV_CCI]"x,##arg)
 #define cci_dbg(l,x,arg...) if(cci_dbg_en && l <= cci_dbg_lv) printk(KERN_DEBUG"[VFE_DEV_CCI_DBG]"x,##arg)

@@ -8,4 +8,4 @@ nand-objs += nand_interface.o \
 	nfd/nand_dev.o \
 	nfd/nand_class.o \
 	nfd/nand_osal_for_linux.o \
-	libnand_sun8iw8p1.a
+	libnand_sun8iw8p1

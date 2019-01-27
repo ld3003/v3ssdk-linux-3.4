@@ -60,11 +60,6 @@ struct sensor_item sensor_list_t[] =
 	{	"ov7736"		,	0x42,		SENSOR_YUV	,	 PIXEL_NUM_0_3M		, CORE_CLK_RATE_FOR_2M},
 	{	"gc2155"		,	0x78,		SENSOR_YUV	,	 PIXEL_NUM_2M		, CORE_CLK_RATE_FOR_2M},
 
-	// Add by Harry
-	{	"ar0330_mipi"		,	0x20,		SENSOR_RAW	,	 PIXEL_NUM_3M		, CORE_CLK_RATE_FOR_3M},
-	{	"ov4689"		,	0x20,		SENSOR_RAW	,	 PIXEL_NUM_3M		, CORE_CLK_RATE_FOR_3M},
-	{	"ov2710_mipi"		,	0x6c,		SENSOR_RAW	,	 PIXEL_NUM_3M		, CORE_CLK_RATE_FOR_3M},
-
 };
 int get_sensor_info(char *sensor_name, struct sensor_item *sensor_info)
 {

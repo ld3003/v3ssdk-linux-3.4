@@ -167,7 +167,6 @@ enum scene_mode
 	SCENE_MODE_SPORTS          = 11,
 	SCENE_MODE_SUNSET          = 12,
 	SCENE_MODE_TEXT            = 13,
-	SCENE_MODE_MAX,
 };
 
 enum colorfx
@@ -347,7 +346,6 @@ struct ae_table_info
 	struct ae_table ae_tbl[10];
 	int length;
 	int ev_step;
-	int shutter_shift;
 };
 
 /*
@@ -461,8 +459,6 @@ struct isp_driver_to_3a_stat
 	struct isp_awb_avp_stat awb_avp_saved;
 	int min_rgb_saved;
 	int c_noise_saved;
-	struct isp_cfg_pt *isp_cfg_saved;
-	struct isp_cfg_pt *isp_ir_cfg_saved;
 };
 
 
@@ -494,8 +490,7 @@ struct exposure_settings
 	int tbl_max_ind;
 	int exposure_cfg[2];
 	int ae_hist_cfg[4];
-	int ae_hist_eq_cfg[13];	
-
+	int ae_hist_eq_cfg[8];	
 	int iso_index;
 	int ae_interval_frame;
 };
@@ -610,9 +605,6 @@ struct isp_3a_param
 	int high_quality_mode_en;
 	int adaptive_frame_rate;
 	int force_frame_rate;
-	int ae_touch_dist_ind;
-	int ae_lum_berfore_gamma;
-	struct ae_table_info ae_tbl_scene[SCENE_MODE_MAX+6];
 
 	/*isp awb param */
 	int awb_interval;
@@ -623,14 +615,12 @@ struct isp_3a_param
 	int awb_light_num;
 	int awb_ext_light_num;
 	int awb_skin_color_num;
-	int awb_special_color_num;
+	int awb_green_color_num;
 	int awb_light_info[320];
 	int awb_ext_light_info[320];
 	int awb_skin_color_info[160];
-	int awb_special_color_info[320];
+	int awb_green_color_info[80];
 	int awb_preset_gain[22];
-	int awb_rgain_favor;
-	int awb_bgain_favor;
 
 	/*isp af param */
 	int af_use_otp;
@@ -643,23 +633,8 @@ struct isp_3a_param
 	int af_fine_step;
 	int af_move_cnt;
 	int af_still_cnt;
-	int af_move_monitor_cnt;
-	int af_still_monitor_cnt;
 	int af_stable_min;
 	int af_stable_max;
-	int af_low_light_ind;
-	int af_near_tolerance;
-	int af_far_tolerance;
-	int af_tolerance_off;
-	int af_peak_th;
-	int af_dir_th;
-	int af_change_ratio;
-	int af_move_minus;
-	int af_still_minus;
-	int af_scene_motion_th;
-	int af_tolerance_tbl_len;	
-	int af_std_code_tbl[20];
-	int af_tolerance_value_tbl[20];	
 };
 
 struct isp_iso_element
@@ -715,13 +690,13 @@ struct isp_tunning_param
 	int dpc_th_slop;
 	int dpc_otf_min_th;
 	int dpc_otf_max_th;
-	int cfa_dir_th;
+
 	/*isp tune param */
 	int bayer_gain_offset[8];
 	int lsc_mod;
 	int csc_coeff[6];
 	int lsc_center[2];
-	unsigned short lsc_tbl[12][768];
+	unsigned short lsc_tbl[8][768];
 	unsigned short hdr_tbl[4][256];
 	unsigned short gamma_tbl[256]; // for hardware
 	unsigned short gamma_tbl_post[256]; //currently real gamma

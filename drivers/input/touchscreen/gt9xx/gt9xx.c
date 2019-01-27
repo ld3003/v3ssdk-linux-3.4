@@ -453,11 +453,17 @@ static void gtp_touch_down(struct goodix_ts_data* ts,s32 id,s32 x,s32 y,s32 w)
         input_report_abs(ts->input_dev, ABS_MT_TOUCH_MAJOR, w);
         input_report_abs(ts->input_dev, ABS_MT_WIDTH_MAJOR, w);
 #else
+#if 0
         input_report_abs(ts->input_dev, ABS_MT_POSITION_X, x);
         input_report_abs(ts->input_dev, ABS_MT_POSITION_Y, y);
         input_report_abs(ts->input_dev, ABS_MT_TOUCH_MAJOR, w);
         input_report_abs(ts->input_dev, ABS_MT_WIDTH_MAJOR, w);
         input_report_abs(ts->input_dev, ABS_MT_TRACKING_ID, id);
+#else
+        input_report_abs(ts->input_dev, ABS_X, x);
+        input_report_abs(ts->input_dev, ABS_Y, y);
+        input_report_key(ts->input_dev, BTN_TOUCH, 1);
+#endif
         input_mt_sync(ts->input_dev);
 #endif
 
@@ -480,8 +486,12 @@ static void gtp_touch_up(struct goodix_ts_data* ts, s32 id)
         input_report_abs(ts->input_dev, ABS_MT_TRACKING_ID, -1);
         dprintk(DEBUG_X_Y_INFO, "Touch id[%2d] release!", id);
 #else
+#if 0
         input_report_abs(ts->input_dev, ABS_MT_TOUCH_MAJOR, 0);
         input_report_abs(ts->input_dev, ABS_MT_WIDTH_MAJOR, 0);
+#else
+        input_report_key(ts->input_dev, BTN_TOUCH, 0);
+#endif
         input_mt_sync(ts->input_dev);
 #endif
 }
@@ -999,13 +1009,17 @@ static s8 gtp_request_input_dev(struct goodix_ts_data *ts)
 //#if GTP_CHANGE_X2Y
 //        GTP_SWAP(ts->abs_x_max, ts->abs_y_max);
 //#endif
-
+#if 0
         input_set_abs_params(ts->input_dev, ABS_MT_POSITION_X, 0, SCREEN_MAX_X, 0, 0);
-        input_set_abs_params(ts->input_dev, ABS_MT_POSITION_Y, 0, SCREEN_MAX_Y, 0, 0);
+        input_set_abs_params(ts->input_dev, ABS_MT_POSITION_Y, 0, SCREEN_MAX_Y, 0, 0); 
         input_set_abs_params(ts->input_dev, ABS_MT_WIDTH_MAJOR, 0, 255, 0, 0);
         input_set_abs_params(ts->input_dev, ABS_MT_TOUCH_MAJOR, 0, 255, 0, 0);	
         input_set_abs_params(ts->input_dev, ABS_MT_TRACKING_ID, 0, 255, 0, 0);
-		set_bit(INPUT_PROP_DIRECT, ts->input_dev->propbit);
+#else
+        input_set_abs_params(ts->input_dev, ABS_X, 0, SCREEN_MAX_X, 0, 0);
+        input_set_abs_params(ts->input_dev, ABS_Y, 0, SCREEN_MAX_Y, 0, 0);
+#endif
+		    set_bit(INPUT_PROP_DIRECT, ts->input_dev->propbit);
     
         ts->input_dev->name = CTP_NAME;
         ts->input_dev->phys = "input/goodix-ts";

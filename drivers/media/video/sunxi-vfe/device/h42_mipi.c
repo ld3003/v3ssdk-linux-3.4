@@ -363,7 +363,7 @@ static int sensor_s_exp_gain(struct v4l2_subdev *sd, struct sensor_exp_gain *exp
   exp_val = exp_gain->exp_val;
   gain_val = exp_gain->gain_val;
   
-	/*printk("h42 sensor exp & gain is %d\t%d\n", exp_val, gain_val);*/
+  printk("h42 sensor exp & gain is %d\t%d\n", exp_val, gain_val);
   
   if(gain_val<1*16)
 	  gain_val=16;

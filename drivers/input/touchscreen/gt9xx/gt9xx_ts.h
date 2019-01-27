@@ -91,10 +91,10 @@ extern struct ctp_config_info config_info;
 
 //***************************PART1:ON/OFF define*******************************
 #define GTP_CUSTOM_CFG        0
-#define GTP_DRIVER_SEND_CFG   1 
+#define GTP_DRIVER_SEND_CFG   0 
 #define GTP_HAVE_TOUCH_KEY    0
 #define GTP_POWER_CTRL_SLEEP  1
-#define GTP_AUTO_UPDATE       1
+#define GTP_AUTO_UPDATE       0
 #define GTP_CHANGE_X2Y        0
 #define GTP_ESD_PROTECT       0
 #define GTP_CREATE_WR_NODE    0

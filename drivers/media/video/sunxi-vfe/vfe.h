@@ -382,9 +382,6 @@ struct vfe_dev {
   unsigned int            thumb_height;
   unsigned int            buf_byte_size;    /* including main and thumb buffer */
   unsigned int            buf_addr;         /* including main and thumb buffer */
-	struct isp_size_settings	size_settings;
-	enum pixel_fmt			isp_fmt[ISP_MAX_CH_NUM];
-	unsigned int 			crop_flag;
   struct bus_info         bus_info;
   struct frame_info       frame_info;
   struct isp_frame_info   isp_frame_info;
@@ -409,9 +406,6 @@ struct vfe_dev {
   struct flash_dev_info                   *fl_dev_info;
   unsigned int						platform_id;
   unsigned int 			vfe_s_input_flag;
-  unsigned int 			nframe_in_buf;
-  unsigned int			set_addr_cnt;
-  struct timer_list		timer_for_reset;
 };
 
 #endif  /* __VFE__H__ */

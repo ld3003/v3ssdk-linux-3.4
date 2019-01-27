@@ -23,7 +23,7 @@ MODULE_DESCRIPTION("A low-level driver for Aptina ar0330_mipi Raw sensors");
 MODULE_LICENSE("GPL");
 
 //for internel driver debug
-#define DEV_DBG_EN      0
+#define DEV_DBG_EN      0 
 #if(DEV_DBG_EN == 1)    
 #define vfe_dev_dbg(x,arg...) printk("[ar0330_mipi Raw]"x,##arg)
 #else
@@ -106,8 +106,6 @@ static inline struct sensor_info *to_state(struct v4l2_subdev *sd)
 
 static struct regval_list sensor_default_regs[] = 
 {
-};
-static struct regval_list sensor_fullsize_30fps_regs[] = { 
     {0x301a,0x0059},	//Reset Sensor
     {REG_DLY,0x0064},
     {0x31AE,0x0202},  //Output Interface Configured to 2lane MIPI
@@ -173,7 +171,7 @@ static struct regval_list sensor_fullsize_30fps_regs[] = {
     {0x3042,0x0000}, //EXTRA_DELAY = 0
     {0x30BA,0x002C}, //DIGITAL_CTRL = 44
     {0x3070,0x0000},
-	
+#if 1
     {0x30FE, 0x0080},  // RESERVED_MFR_30FE
 	{0x31E0, 0x0703},  // RESERVED_MFR_31E0    dpc enable reg	0x0003
 	{0x3ECE, 0x08FF},  // RESERVED_MFR_3ECE
@@ -193,90 +191,19 @@ static struct regval_list sensor_fullsize_30fps_regs[] = {
 	{0x3EDA, 0x88BC},  // RESERVED_MFR_3EDA
 	{0x3EDC, 0xAA63},  // RESERVED_MFR_3EDC
 
+#endif
 
 
 
-	  {0x301A,0x025C}, //Enable Streaming
-
+    {0x301A,0x025C}, //Enable Streaming
 };
 
-static struct regval_list sensor_fullsize_25fps_regs[] = {
-    {0x301a,0x0059},	//Reset Sensor
-    {REG_DLY,0x0064},
-    {0x31AE,0x0202},  //Output Interface Configured to 2lane MIPI
-    {0x301A,0x0058},//Disable Streaming
-    {REG_DLY,0x0032},
-    {0x3064,0x1802},
-    {0x3078,0x0001},  //Marker to say that 'Defaults' have been run
-    {0x31e0,0x0003},
 
-    //Toggle Flash on Each Frame
-    {0x3046,0x4038},  // Enable Flash Pin
-    {0x3048,0x8480},  // Flash Pulse Length
-    {0x31E0,0x0203},  //OTPM V5
-    {0x3ED2,0x0146},
-    {0x3EDA,0x88BC},
-    {0x3EDC,0xAA63},
-    {0x305E,0x00A0},
+//static struct regval_list sensor_sxga_regs[] = { //SXGA: 1280*960@30fps 
+//};
 
-    //PLL_settings 588Mbps 98Mhz
-    //STATE = Master Clock,98000000
-    {0x302A,0x0006},     //VT_PIX_CLK_DIV = 6
-    {0x302C,0x0002},     //VT_SYS_CLK_DIV = 2
-    {0x302E,0x0002},     //PRE_PLL_CLK_DIV = 2
-    {0x3030,0x0031},     //PLL_MULTIPLIER = 49
-    {0x3036,0x000C},     //OP_PIX_CLK_DIV = 12
-    {0x3038,0x0001},     //OP_SYS_CLK_DIV = 1
-    {0x31AC,0x0C0C},     //DATA_FORMAT_BITS
-
-    //MIPI Port Timing continuous mode
-    {0x31B0,0x002d},
-    {0x31B2,0x0012},
-    {0x31B4,0x3b44},
-    {0x31B6,0x314d},
-    {0x31B8,0x2089},
-    {0x31BA,0x0206},
-    {0x31BC,0x8005},
-    {0x31BE,0x2003},
-
-    //Timing_settings
-    {0x3002, 0x0078},  //Y_ADDR_START = 120
-    {0x3004, 0x0006},  //X_ADDR_START = 6
-    {0x3006, 0x0587},  //Y_ADDR_END = 1415
-    {0x3008, 0x0905},  //X_ADDR_END = 2309
-    {0x300A, 0x0622},  //FRAME_LENGTH_LINES = 1570
-    {0x300C, 0x04E0},  //LINE_LENGTH_PCK = 1248
-    {0x3012, 0x0621},  //COARSE_INTEGRATION_TIME = 1569
-    {0x3014, 0x0000},  //FINE_INTEGRATION_TIME = 0
-    {0x30A2, 0x0001},  //X_ODD_INC = 1
-    {0x30A6, 0x0001},  //Y_ODD_INC = 1
-
-	  {0x3040,0x0000}, //READ_MODE = 0
-	  {0x3042,0x0000}, //EXTRA_DELAY = 0
-	  {0x30BA,0x002C}, //DIGITAL_CTRL = 44
-	  {0x3070,0x0000},
-	
-	  {0x30FE, 0x0080},  // RESERVED_MFR_30FE
-		{0x31E0, 0x0703},  // RESERVED_MFR_31E0    dpc enable reg	0x0003
-		{0x3ECE, 0x08FF},  // RESERVED_MFR_3ECE
-		{0x3ED0, 0xE4F6},  // RESERVED_MFR_3ED0
-		{0x3ED2, 0x0146},  // RESERVED_MFR_3ED2
-		{0x3ED4, 0x8F6C},  // RESERVED_MFR_3ED4
-		{0x3ED6, 0x66CC},  // RESERVED_MFR_3ED6
-		{0x3ED8, 0x8C42},  // RESERVED_MFR_3ED8
-		{0x3EDA, 0x889B},  // RESERVED_MFR_3EDA
-		{0x3EDC, 0x8863},  // RESERVED_MFR_3EDC
-		{0x3EDE, 0xAA04},  // RESERVED_MFR_3EDE
-		{0x3EE0, 0x15F0},  // RESERVED_MFR_3EE0
-		{0x3EE6, 0x008C},  // RESERVED_MFR_3EE6
-		{0x3EE8, 0x2024},  // RESERVED_MFR_3EE8
-		{0x3EEA, 0xFF1F},  // RESERVED_MFR_3EEA
-		{0x3F06, 0x046A},  // RESERVED_MFR_3F06
-		{0x3EDA, 0x88BC},  // RESERVED_MFR_3EDA
-		{0x3EDC, 0xAA63},  // RESERVED_MFR_3EDC
-	
-	  {0x301A,0x025C}, //Enable Streaming
-};
+//static struct regval_list sensor_xga_regs[] = { //XGA: 1024*768
+//};
 
 
 //static struct regval_list sensor_1080p_regs[] = { //1080: 1920*1080@30fps EIS
@@ -588,7 +515,6 @@ static int sensor_power(struct v4l2_subdev *sd, int on)
 			break;
 		case CSI_SUBDEV_STBY_OFF:
 			vfe_dev_dbg("CSI_SUBDEV_STBY_OFF!\n");
-			break;
 			cci_lock(sd);
 			vfe_set_mclk_freq(sd,MCLK);
 			vfe_set_mclk(sd,ON);
@@ -604,17 +530,17 @@ static int sensor_power(struct v4l2_subdev *sd, int on)
 			vfe_dev_dbg("CSI_SUBDEV_PWR_ON!\n");
 			cci_lock(sd);
 			//power on reset
-			vfe_gpio_set_status(sd,PWDN,1);//set the gpio to output
+//			vfe_gpio_set_status(sd,PWDN,1);//set the gpio to output
 			vfe_gpio_set_status(sd,RESET,1);//set the gpio to output
 			vfe_gpio_set_status(sd,POWER_EN,1);//set the gpio to output 
 			
 			vfe_gpio_write(sd,RESET,CSI_GPIO_HIGH);  
-			vfe_gpio_write(sd,PWDN,CSI_GPIO_HIGH);
-			//vfe_gpio_write(sd,POWER_EN,CSI_GPIO_LOW);
+//			vfe_gpio_write(sd,PWDN,CSI_GPIO_HIGH);
+			vfe_gpio_write(sd,POWER_EN,CSI_GPIO_LOW);
 			usleep_range(1000,1200);
 			//power supply
 			vfe_set_pmu_channel(sd,AVDD,ON);	
-			//vfe_gpio_write(sd,POWER_EN,CSI_GPIO_HIGH);
+			vfe_gpio_write(sd,POWER_EN,CSI_GPIO_HIGH);
 			vfe_set_pmu_channel(sd,DVDD,ON);
 			vfe_set_pmu_channel(sd,AFVDD,ON);
 			usleep_range(1000,1200);
@@ -624,9 +550,9 @@ static int sensor_power(struct v4l2_subdev *sd, int on)
 			vfe_set_mclk(sd,ON);
 			usleep_range(10000,12000);
 
-			usleep_range(7000,8000);
-			vfe_gpio_write(sd,PWDN,CSI_GPIO_LOW); 
-			usleep_range(10000,12000); 
+//			usleep_range(7000,8000);
+//			vfe_gpio_write(sd,PWDN,CSI_GPIO_LOW); 
+//			usleep_range(10000,12000); 
 			//reset on io
 			vfe_gpio_write(sd,RESET,CSI_GPIO_LOW);
 			usleep_range(20000,22000);
@@ -637,7 +563,6 @@ static int sensor_power(struct v4l2_subdev *sd, int on)
 			break;
 		case CSI_SUBDEV_PWR_OFF:
 			vfe_dev_dbg("CSI_SUBDEV_PWR_OFF!\n");
-			break;
 			cci_lock(sd);
 //			vfe_gpio_set_status(sd,PWDN,1);//set the gpio to output
 //			vfe_gpio_set_status(sd,RESET,1);//set the gpio to output
@@ -807,62 +732,42 @@ static struct sensor_win_size sensor_win_sizes[] = {
         .hoffset    = 0,
         .voffset    = 0,
         .hts        = 1248,
-        .vts        = 1570,
-        .pclk       = 49*1000*1000,
-        .mipi_bps	  = (588*1000*1000),
-        .fps_fixed  = 25,
-        .bin_factor = 1,
-        .intg_min   = 1<<4,
-        .intg_max   = 1570<<4,//
-        .gain_min   = 1<<4,
-        .gain_max   = 64<<4,
-        .regs       = sensor_fullsize_25fps_regs,
-        .regs_size  = ARRAY_SIZE(sensor_fullsize_25fps_regs),
-        .set_size   = NULL,
-    },
-#if 0
-    {
-        .width      = 2304,
-        .height     = 1296,
-        .hoffset    = 0,
-        .voffset    = 0,
-        .hts        = 1248,
         .vts        = 1308,
         .pclk       = 49*1000*1000,
         .mipi_bps	= (588*1000*1000),
-        .fps_fixed  = 30,
+        .fps_fixed  = 1,
         .bin_factor = 1,
         .intg_min   = 1<<4,
         .intg_max   = 1308<<4,//
         .gain_min   = 1<<4,
         .gain_max   = 64<<4,
-        .regs       = sensor_fullsize_30fps_regs,
-        .regs_size  = ARRAY_SIZE(sensor_fullsize_30fps_regs),
+        .regs       = sensor_default_regs,
+        .regs_size  = ARRAY_SIZE(sensor_default_regs),
         .set_size   = NULL,
     },
-#endif
     /* 1080P */
     {
-        .width	    = HD1080_WIDTH,
-        .height 	= HD1080_HEIGHT,
+        .width      = HD1080_WIDTH,
+        .height     = HD1080_HEIGHT,
         .hoffset    = 0,
         .voffset    = 0,
         .hts        = 1248,
         .vts        = 1308,
         .pclk       = 49*1000*1000,
-        .mipi_bps	= (588*1000*1000)/1,
-        .fps_fixed  = 30,
+        .mipi_bps   = (588*1000*1000)/1,
+        .fps_fixed  = 1,
         .bin_factor = 1,
         .intg_min   = 1<<4,
         .intg_max   = 1308<<4,//
         .gain_min   = 1<<4,
         .gain_max   = 64<<4,
         .width_input = 2304,
-		.height_input = 1296,
-        .regs       = sensor_fullsize_30fps_regs,
-        .regs_size  = ARRAY_SIZE(sensor_fullsize_30fps_regs),
+        .height_input = 1296,
+        .regs       = sensor_default_regs,
+        .regs_size  = ARRAY_SIZE(sensor_default_regs),
         .set_size   = NULL,
     },
+    /* 720P */
     {
         .width	    = HD720_WIDTH,
         .height 	= HD720_HEIGHT,
@@ -1236,7 +1141,6 @@ static int sensor_probe(struct i2c_client *client,
     struct v4l2_subdev *sd;
     struct sensor_info *info;
 
-	printk("++AR0330 MIPI probe!!\n");
     info = kzalloc(sizeof(struct sensor_info), GFP_KERNEL);
     if (info == NULL)
         return -ENOMEM;
@@ -1279,7 +1183,6 @@ static struct i2c_driver sensor_driver = {
 };
 static __init int init_sensor(void)
 {
-	printk("++ar0330 mipi init!!\n");
 	return cci_dev_init_helper(&sensor_driver);
 }
 

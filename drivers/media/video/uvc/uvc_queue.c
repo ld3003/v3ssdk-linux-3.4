@@ -344,8 +344,13 @@ int uvc_dequeue_buffer(struct uvc_video_queue *queue,
 	}
 	if(buf->buf.bytesused >= buf->buf.length)
 	{
+		while(1)
+		{
 			uvc_printk(KERN_ERR, "(f:%s, l:%d) fatal error! v4l2_buffer->buf.byteused[%d]>=buflength[%d], jpeg picture may be cut!", __FUNCTION__, __LINE__, buf->buf.bytesused, buf->buf.length);
+		}
+		//panic("(f:%s, l:%d) fatal error! v4l2_buffer->buf.byteused[%d]>buflength[%d], jpeg picture may be cut!", __FUNCTION__, __LINE__, buf->buf.bytesused, buf->buf.length);
 	}
+
 	uvc_trace(UVC_TRACE_CAPTURE, "Dequeuing buffer %u (%u, %u bytes).\n",
 		buf->buf.index, buf->state, buf->buf.bytesused);
 

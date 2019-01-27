@@ -24,7 +24,6 @@
 #include "SENSOR_H/h22_mipi_isp_cfg.h"
 #include "SENSOR_H/gc1004_mipi_isp_cfg.h"
 #include "SENSOR_H/ov4689_isp_cfg.h"
-#include "SENSOR_H/ov683_raw_default_v3.h"
 #define ISP_CFG_ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 
 struct isp_cfg_item isp_cfg_array[] = 
@@ -34,7 +33,6 @@ struct isp_cfg_item isp_cfg_array[] =
 	{	"h22_mipi",		    &h22_mipi_isp_cfg,	  },    
 	{	"gc1004_mipi",		&gc1004_mipi_isp_cfg,	},    
 	{	"ov4689",		      &ov4689_isp_cfg,	    },    
-	{	"ov683_raw",		      &ov683_raw_default_v3,	    }, 
 };
 
 int get_isp_cfg(char *isp_cfg_name, struct isp_cfg_item *isp_cfg_info)
