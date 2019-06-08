@@ -23,7 +23,7 @@ MODULE_DESCRIPTION("A low-level driver for Aptina ar0330_mipi Raw sensors");
 MODULE_LICENSE("GPL");
 
 //for internel driver debug
-#define DEV_DBG_EN      0 
+#define DEV_DBG_EN      1
 #if(DEV_DBG_EN == 1)    
 #define vfe_dev_dbg(x,arg...) printk("[ar0330_mipi Raw]"x,##arg)
 #else

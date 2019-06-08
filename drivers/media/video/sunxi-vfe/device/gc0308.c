@@ -25,7 +25,7 @@ MODULE_LICENSE("GPL");
 
 
 //for internel driver debug
-#define DEV_DBG_EN   		0
+#define DEV_DBG_EN   		1
 #if(DEV_DBG_EN == 1)		
 #define vfe_dev_dbg(x,arg...) printk("[CSI_DEBUG][GC0308]"x,##arg)
 #else

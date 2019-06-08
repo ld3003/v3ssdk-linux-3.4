@@ -33,7 +33,7 @@ MODULE_LICENSE("GPL");
 #define vfe_dev_err(x,arg...) printk("[OV5640]"x,##arg)
 #define vfe_dev_print(x,arg...) printk("[OV5640]"x,##arg)
 
-#define CAP_BDG 0
+#define CAP_BDG 1
 #if(CAP_BDG == 1)
 #define vfe_dev_cap_dbg(x,arg...) printk("[OV5640_CAP_DBG]"x,##arg)
 #else
@@ -2605,13 +2605,19 @@ static int sensor_read(struct v4l2_subdev *sd, unsigned short reg,
 static int sensor_write(struct v4l2_subdev *sd, unsigned short reg,
     unsigned char value)
 {
+	char readval;
 	int ret=0;
 	int cnt=0;
   
   ret = cci_write_a16_d8(sd,reg,value);
+	cci_read_a16_d8(sd,reg,&readval);
+  printk("@@@@@@@@@@@@@@ %04x %04x %04x \n",reg,value,readval);
+
   while(ret!=0&&cnt<2)
   {
   	ret = cci_write_a16_d8(sd,reg,value);
+
+
   	cnt++;
   }
   if(cnt>0)
@@ -4261,6 +4267,7 @@ static int sensor_init(struct v4l2_subdev *sd, u32 val)
   info->tpf.numerator = 1;            
   info->tpf.denominator = 30;    /* 30fps */    
   
+  printk("sensor init \n");
   ret = sensor_write_array(sd, sensor_default_regs, ARRAY_SIZE(sensor_default_regs));  
   if(ret < 0) {
     vfe_dev_err("write sensor_default_regs error\n");
@@ -4495,9 +4502,10 @@ static int sensor_enum_fmt(struct v4l2_subdev *sd, unsigned index,
 static int sensor_enum_size(struct v4l2_subdev *sd,
                             struct v4l2_frmsizeenum *fsize)
 {
+  printk("@@@@@@@@@@@@@@@@@sensor_win_sizes[fsize->index] %d\n",fsize->index);
   if(fsize->index > N_WIN_SIZES-1)
   	return -EINVAL;
-  
+  printk("@@@@@@@@@@@@@@@@@@sensor_win_sizes[fsize->index] %d\n",fsize->index);
   fsize->type = V4L2_FRMSIZE_TYPE_DISCRETE;
   fsize->discrete.width = sensor_win_sizes[fsize->index].width;
   fsize->discrete.height = sensor_win_sizes[fsize->index].height;
