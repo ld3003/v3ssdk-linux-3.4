@@ -43,7 +43,7 @@ MODULE_LICENSE("GPL");
                         }
 
 //define module timing
-#define MCLK              (24*1000*1000)
+#define MCLK              (8*1000*1000)
 #define VREF_POL          V4L2_MBUS_VSYNC_ACTIVE_HIGH
 #define HREF_POL          V4L2_MBUS_HSYNC_ACTIVE_HIGH
 #define CLK_POL           V4L2_MBUS_PCLK_SAMPLE_RISING

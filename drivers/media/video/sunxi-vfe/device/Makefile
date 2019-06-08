@@ -9,7 +9,7 @@ obj-$(CONFIG_OV4689_SDV)	+= ov4689_sdv.o
 obj-$(CONFIG_GC1004_MIPI)	+= gc1004_mipi.o
 obj-$(CONFIG_H22_MIPI)		+= h22_mipi.o
 obj-$(CONFIG_NT99231_MIPI)		+= nt99231_mipi.o
-obj-m		+= ov2640.o
+obj-m		+= ov5640.o
 
 
 

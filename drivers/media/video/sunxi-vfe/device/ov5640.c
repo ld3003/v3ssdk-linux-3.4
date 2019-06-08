@@ -24,7 +24,7 @@ MODULE_LICENSE("GPL");
 
 #define AF_WIN_NEW_COORD
 //for internel driver debug
-#define DEV_DBG_EN      0
+#define DEV_DBG_EN      1
 #if(DEV_DBG_EN == 1)    
 #define vfe_dev_dbg(x,arg...) printk("[OV5640]"x,##arg)
 #else
@@ -4200,10 +4200,11 @@ static int sensor_detect(struct v4l2_subdev *sd)
   unsigned char rdval;
   
   LOG_ERR_RET(sensor_read(sd, 0x300a, &rdval))
-  
+  printk("rdval %02x \n",rdval);
   if(rdval != 0x56)
     return -ENODEV;
   LOG_ERR_RET(sensor_read(sd, 0x300b, &rdval))
+  printk("rdval %02x \n",rdval);
   if(rdval != 0x40)
      return -ENODEV;
   return 0;
