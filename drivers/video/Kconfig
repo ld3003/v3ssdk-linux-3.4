@@ -262,7 +262,7 @@ comment "Frame buffer hardware drivers"
 	depends on FB
 
 source "drivers/video/sunxi/Kconfig"
-
+source "drivers/video/fbtft/Kconfig"
 config FB_GRVGA
 	tristate "Aeroflex Gaisler framebuffer support"
 	depends on FB && SPARC
@@ -2419,7 +2419,6 @@ source "drivers/video/omap/Kconfig"
 source "drivers/video/omap2/Kconfig"
 source "drivers/video/exynos/Kconfig"
 source "drivers/video/backlight/Kconfig"
-source "drivers/video/fbtft/Kconfig"
 
 if VT
 	source "drivers/video/console/Kconfig"

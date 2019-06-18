@@ -310,7 +310,7 @@ static int sensor_s_exp(struct v4l2_subdev *sd, unsigned int exp_val)
 {
     struct sensor_info *info = to_state(sd);
 
-    vfe_dev_dbg("sensor_set_exposure = %d\n", exp_val);
+    //vfe_dev_dbg("sensor_set_exposure = %d\n", exp_val);
     if(exp_val>0xffffff)
         exp_val=0xfffff0;
     if(exp_val<16)

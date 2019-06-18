@@ -1517,17 +1517,17 @@ isp_exp_handle:
 			bsp_csi_int_disable(dev->vip_sel, dev->cur_ch,CSI_INT_FRAME_DONE);
 		if (dev->first_flag == 0) {
 			dev->first_flag++;
-			vfe_print("capture video mode!\n");
+			//vfe_print("capture video mode!\n");
 			goto set_isp_stat_addr;
 		}
 		if (dev->first_flag == 1) {
 			dev->first_flag++;
-			vfe_print("capture video first frame done!\n");
+			//vfe_print("capture video first frame done!\n");
 		}
 
 		//video buffer handle:
 		if ((&dma_q->active) == dma_q->active.next->next->next) {
-			vfe_warn("Only two buffer left for csi\n");
+			//vfe_warn("Only two buffer left for csi\n");
 			dev->first_flag=0;
 			goto unlock;
 		}
@@ -1535,7 +1535,7 @@ isp_exp_handle:
 
 		/* Nobody is waiting on this buffer*/
 		if (!waitqueue_active(&buf->vb.done)) {
-			vfe_warn(" Nobody is waiting on this video buffer,buf = 0x%p\n",buf);
+			//vfe_warn(" Nobody is waiting on this video buffer,buf = 0x%p\n",buf);
 		}
 		list_del(&buf->vb.queue);
 		do_gettimeofday(&buf->vb.ts);
