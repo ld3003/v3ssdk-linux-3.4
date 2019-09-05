@@ -36,6 +36,7 @@
 #include "esp_ext.h"
 #endif /* USE_EXT_GPIO */
 
+ #include <linux/io.h>
 
 #define ESP_DMA_IBUFSZ   2048
 
@@ -57,6 +58,76 @@ static int esdio_power_on(struct esp_sdio_ctrl *sctrl);
 void sif_set_clock(struct sdio_func *func, int clk);
 
 #include "sdio_stub.c"
+
+
+typedef struct
+{
+	unsigned int CFG[4];
+	unsigned int DAT;
+	unsigned int DRV0;
+	unsigned int DRV1;
+	unsigned int PUL0;
+	unsigned int PUL1;
+} PIO_Struct;
+
+typedef struct
+{
+	PIO_Struct Pn[7];
+} PIO_Map;
+
+typedef enum {
+	PA = 0,
+	PB = 1,
+	PC = 2,
+	PD = 3,
+	PE = 4,
+	PF = 5,
+	PG = 6,
+} PORT;
+
+typedef enum {
+	IN = 0x00,
+	OUT = 0x01,
+	AUX = 0x02,
+	INT = 0x06,
+	DISABLE = 0x07,
+} PIN_MODE;
+
+static PIO_Map *PIO;
+
+void GPIO_INIT()
+{
+	PIO = (PIO_Map *)((unsigned int)ioremap(0x1C20800,sizeof(PIO_Map)));
+}
+
+void GPIO_ConfigPin(PORT port, unsigned int pin, PIN_MODE mode)
+{
+	PIO->Pn[port].CFG[pin / 8] &= ~((unsigned int)0x07 << pin % 8 * 4);
+	PIO->Pn[port].CFG[pin / 8] |= ((unsigned int)mode << pin % 8 * 4);
+	printk("struct PIO_Struct size : %d",sizeof(PIO->Pn[port]));
+}
+
+void GPIO_SetPin(PORT port, unsigned int pin, unsigned int level)
+{
+	if (level)
+		PIO->Pn[port].DAT |= (1 << pin);
+	else
+		PIO->Pn[port].DAT &= ~(1 << pin);
+}
+
+void ctrl_pwr()
+{
+	int i=0;
+	GPIO_INIT();
+	GPIO_ConfigPin(PB,3,OUT);
+	for(i=0;i<0xfff;i++)
+	{
+		GPIO_SetPin(PB,3,0);
+	}
+
+	GPIO_SetPin(PB,3,1);
+
+}
 
 void sif_lock_bus(struct esp_pub *epub)
 {
@@ -487,6 +558,8 @@ void sif_set_clock(struct sdio_func *func, int clk)
 static int esp_sdio_probe(struct sdio_func *func, const struct sdio_device_id *id);
 static void esp_sdio_remove(struct sdio_func *func);
 
+
+
 static int esp_sdio_probe(struct sdio_func *func, const struct sdio_device_id *id) 
 {
         int err = 0;
@@ -787,15 +860,23 @@ static struct sdio_driver esp_sdio_dummy_driver = {
 
 int esp_sdio_init(void) 
 {
-#define ESP_WAIT_UP_TIME_MS 11000
+#define ESP_WAIT_UP_TIME_MS 1000
         int err;
-        int retry = 3;
+        int retry = 0;
         bool powerup = false;
 
         esp_dbg(ESP_DBG_TRACE, "%s \n", __func__);
 
+
+	printk("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ ctrl pin \n");
+	ctrl_pwr();
+
+
+
         esp_wakelock_init();
         esp_wake_lock();
+
+	//goto _fail;
 
         do {
                 sema_init(&esp_powerup_sem, 0);
