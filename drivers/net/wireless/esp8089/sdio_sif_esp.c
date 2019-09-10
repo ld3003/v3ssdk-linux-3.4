@@ -118,14 +118,13 @@ void GPIO_SetPin(PORT port, unsigned int pin, unsigned int level)
 void ctrl_pwr()
 {
 	int i=0;
+
 	GPIO_INIT();
 	GPIO_ConfigPin(PB,3,OUT);
-	for(i=0;i<0xfff;i++)
-	{
-		GPIO_SetPin(PB,3,0);
-	}
-
 	GPIO_SetPin(PB,3,1);
+
+	msleep(500);
+
 
 }
 
@@ -870,6 +869,10 @@ int esp_sdio_init(void)
 
 	printk("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ ctrl pin \n");
 	ctrl_pwr();
+
+	msleep(1000);
+
+	printk("########################################\n");
 
 
 
