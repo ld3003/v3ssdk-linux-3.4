@@ -121,9 +121,11 @@ void ctrl_pwr()
 
 	GPIO_INIT();
 	GPIO_ConfigPin(PB,3,OUT);
-	GPIO_SetPin(PB,3,1);
+	GPIO_SetPin(PB,3,0);
 
 	msleep(500);
+	GPIO_SetPin(PB,3,1);
+
 
 
 }
