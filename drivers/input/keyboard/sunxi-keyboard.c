@@ -416,7 +416,6 @@ static irqreturn_t sunxi_isr_key(int irq, void *dummy)
 	u32  reg_val = 0;
 	int judge_flag = 0;
 	 
-	dprintk(DEBUG_INT, "Key Interrupt\n");
 	
 	reg_val = sunxi_keyboard_read_ints();
 	//writel(reg_val,KEY_BASSADDRESS + LRADC_INT_STA);
@@ -428,6 +427,7 @@ static irqreturn_t sunxi_isr_key(int irq, void *dummy)
 	if (reg_val & LRADC_ADC0_DATAPEND) {
 		key_val = sunxi_keyboard_read_data(KEY_BASSADDRESS+LRADC_DATA0);
 		
+		//printk("key_val %d \n",key_val);
 		if (key_val < 0x3f) {
 
 			compare_buffer[key_cnt] = key_val&0x3f;
@@ -450,8 +450,7 @@ static irqreturn_t sunxi_isr_key(int irq, void *dummy)
 			}
 
 			if (1 == judge_flag) {
-				dprintk(DEBUG_INT, "report data: key_val :%8d transfer_code: %8d , scancode: %8d\n", \
-					key_val, transfer_code, scancode);
+				//printk("report data: key_val :%d transfer_code: %d , scancode: %d\n", key_val, transfer_code, scancode);
 
 				if (transfer_code == scancode) {
 					/* report repeat key value */
