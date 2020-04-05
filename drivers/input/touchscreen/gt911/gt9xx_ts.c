@@ -1651,7 +1651,7 @@ static int ctp_get_system_config(void)
         revert_x_flag = config_info.revert_x_flag;
         revert_y_flag = config_info.revert_y_flag;
         exchange_x_y_flag = config_info.exchange_x_y_flag;
-        if((twi_id == 0) || (screen_max_x == 0) || (screen_max_y == 0)){
+        if(/*(twi_id == 0) || */ (screen_max_x == 0) || (screen_max_y == 0)){
             printk("%s:read config error!\n",__func__);
             return 0;
         }
