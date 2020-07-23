@@ -90,7 +90,7 @@ struct ctp_config_info config_info = {
 	.int_number = 0,
 };
 
-static u32 debug_mask = 0;
+static u32 debug_mask = 0x0;
 enum{
 	DEBUG_INIT = 1U << 0,
 	DEBUG_SUSPEND = 1U << 1,
@@ -419,7 +419,7 @@ static void gtp_touch_down(struct goodix_ts_data* ts,s32 id,s32 x,s32 y,s32 w)
     input_mt_sync(ts->input_dev);
 #endif
 
-    GTP_DEBUG("ID:%d, X:%d, Y:%d, W:%d", id, x, y, w);
+    //printk("ID:%d, X:%d, Y:%d, W:%d", id, x, y, w);
 }
 
 /*******************************************************
@@ -638,7 +638,7 @@ Output:
 static irqreturn_t goodix_ts_irq_handler(int irq, void *dev_id)
 {	    
 	struct goodix_ts_data *ts = (struct goodix_ts_data *)dev_id;
-	dprintk(DEBUG_INT_INFO,"==========------TS Interrupt-----============\n");  
+	printk("==========------TS Interrupt-----============\n");  
 
 	queue_work(goodix_wq, &ts->work);
 	return 0;
@@ -894,7 +894,7 @@ static s32 gtp_get_info(struct i2c_client *client)
     }
     int_handle = opr_buf[2] & 0x03;
     
-    GTP_INFO("X_MAX = %d, Y_MAX = %d, TRIGGER = 0x%02x",
+    GTP_INFO("X_MAX777 = %d, Y_MAX = %d, TRIGGER = 0x%02x",
             reg_max_x,reg_max_y, int_handle);
             
     return SUCCESS;
@@ -920,7 +920,6 @@ static s32 gtp_init_panel(struct goodix_ts_data *ts)
     u8 check_sum = 0;
     u8 opr_buf[16];
     u8 sensor_id = 0;
-
     u8 cfg_info_group1[] = CTP_CFG_GROUP1;
     u8 cfg_info_group2[] = CTP_CFG_GROUP2;
     u8 cfg_info_group3[] = CTP_CFG_GROUP3;
@@ -1036,7 +1035,7 @@ static s32 gtp_init_panel(struct goodix_ts_data *ts)
     
 #else // DRIVER NOT SEND CONFIG
     ts->gtp_cfg_len = GTP_CONFIG_MAX_LENGTH;
-    ret = gtp_i2c_read(ts->client, config, ts->gtp_cfg_len + GTP_ADDR_LENGTH);
+    ret =0;//gtp_i2c_read(ts->client, config, ts->gtp_cfg_len + GTP_ADDR_LENGTH);
     if (ret < 0)
     {
         GTP_ERROR("Read Config Failed, Using DEFAULT Resolution & INT Trigger!");
@@ -1057,6 +1056,10 @@ static s32 gtp_init_panel(struct goodix_ts_data *ts)
 
     {
     #if GTP_DRIVER_SEND_CFG
+        int i=0;
+        for(i=0;i<sizeof(config);i++)
+            printk("%02X ",config[i]);
+
         ret = gtp_send_cfg(ts->client);
         if (ret < 0)
         {
@@ -1072,8 +1075,9 @@ static s32 gtp_init_panel(struct goodix_ts_data *ts)
         }
         config[ts->gtp_cfg_len] = (~check_sum) + 1;
     #endif
-        GTP_INFO("X_MAX = %d, Y_MAX = %d, TRIGGER = 0x%02x",
-            screen_max_x,screen_max_y,int_handle);
+        GTP_INFO("X_MAX 888 = %d, Y_MAX = %d, TRIGGER = 0x%02x,version=%d",
+            screen_max_x,screen_max_y,int_handle,grp_cfg_version);
+        GTP_INFO("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
     }
     
     msleep(10);
